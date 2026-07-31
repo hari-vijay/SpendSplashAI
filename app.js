@@ -797,15 +797,14 @@ padding:0 11px
 
       });
 
-      const body = await response.json();
+     const body = await response.json();
 
-      if (!response.ok) {
+console.log("Status:", response.status);
+console.log("Body:", body);
 
-        throw new Error(
-          body.error || "AI is unavailable"
-        );
-
-      }
+if (!response.ok) {
+    throw new Error(JSON.stringify(body));
+}
 
       answer.textContent = body.answer;
 
@@ -813,14 +812,19 @@ padding:0 11px
         "AI answer based on your current budget.";
 
     } catch (error) {
+    console.error(error);
 
-      answer.textContent =
-        "AI is not connected yet. Deploy this folder and set GEMINI_API_KEY in Vercel Environment Variables.";
+    const responseText = await error?.response?.text?.().catch(() => null);
 
-      status.textContent =
-        "Your salary and expenses remain private in this browser until deployment.";
+    answer.style.display = "block";
+    answer.textContent = error.message || "Unknown error";
 
+    if (responseText) {
+        answer.textContent += "\n\n" + responseText;
     }
+
+    status.textContent = "Request failed.";
+}
 
   };
 
