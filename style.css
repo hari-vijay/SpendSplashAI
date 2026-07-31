@@ -1194,3 +1194,24 @@ button#salary-edit-2:active{
 transform:translateY(0);
 
 }
+.transaction-actions{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+.delete-expense{
+    border:none;
+    background:#ffe9e9;
+    color:#d62828;
+    width:34px;
+    height:34px;
+    border-radius:8px;
+    cursor:pointer;
+    font-size:16px;
+}
+
+.delete-expense:hover{
+    background:#d62828;
+    color:white;
+}
