@@ -1,0 +1,746 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width,initial-scale=1">
+
+    <title>
+        Spend Splash
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="style.css">
+
+</head>
+
+<body>
+
+<main class="shell">
+
+<header>
+
+<a
+class="brand"
+href="#">
+
+<i>₹</i>
+
+Spend Splash
+
+</a>
+
+<nav>
+
+<span class="status">
+
+<b></b>
+
+Live money plan
+
+</span>
+
+<button
+id="reset-data"
+class="ghost">
+
+Start over
+
+</button>
+
+</nav>
+
+</header>
+
+<section class="welcome">
+
+<div>
+
+<p class="kicker">
+
+MY MONTHLY DASHBOARD
+
+</p>
+
+<h1>
+
+My spending,
+
+<br>
+
+<em>
+
+in one place.
+
+</em>
+
+</h1>
+
+<p>
+
+Salary,
+expenses,
+and remaining balance —
+all in one view.
+
+</p>
+
+</div>
+
+<button
+class="add-main"
+id="add-manual">
+
++ Add expense
+
+</button>
+
+</section>
+
+<section class="balance-card">
+
+<div class="balance-top">
+
+<span>
+
+THIS MONTH'S AVAILABLE BALANCE
+
+</span>
+
+<span
+id="health-pill"
+class="health-pill">
+
+On track
+
+</span>
+
+</div>
+
+<strong
+id="balance-main">
+
+₹0
+
+</strong>
+
+<p
+id="balance-story">
+
+Add your monthly salary to start your live money plan.
+
+</p>
+
+<div class="balance-line">
+
+<i id="spent-line"></i>
+
+</div>
+
+<div class="balance-labels">
+
+<span
+id="spent-label">
+
+₹0 spent
+
+</span>
+
+<span
+id="salary-label">
+
+₹0 salary
+
+</span>
+
+</div>
+
+<div class="balance-actions">
+
+<span class="balance-note">
+
+Updates automatically after every expense.
+
+</span>
+
+<button
+class="text-button"
+id="salary-edit">
+
+Edit salary & goal
+
+</button>
+
+</div>
+
+</section>
+
+<section class="quick-section">
+
+<p class="kicker">
+
+QUICK CAPTURE
+
+</p>
+
+<form id="quick-form">
+
+<input
+id="quick-input"
+placeholder="Try: Zomato dinner 450 or Uber 320">
+
+<button>
+
+Add
+
+</button>
+
+</form>
+
+<p
+id="parse-feedback"
+class="feedback">
+
+</p>
+
+</section>
+
+<section class="insight-grid">
+
+<article class="panel ai-panel">
+
+<div class="panel-head">
+
+<div>
+
+<p class="kicker">
+
+PAISA AI COACH
+
+<span class="live">
+
+LIVE
+
+</span>
+
+</p>
+
+<h2>
+
+What should I do next?
+
+</h2>
+
+</div>
+
+<span class="spark">
+
+&#10022;
+
+</span>
+
+</div>
+
+<p
+id="ai-summary"
+class="ai-summary">
+
+I will turn your balance into a simple action plan.
+
+</p>
+
+<div
+class="ai-answer"
+id="ai-result">
+
+</div>
+
+<div class="ask-row">
+
+<button data-prompt="save">
+
+Save more
+
+</button>
+
+<button data-prompt="invest">
+
+Can I invest?
+
+</button>
+
+<button data-prompt="risk">
+
+Check risk
+
+</button>
+
+</div>
+
+</article>
+
+<article class="panel spend-panel">
+
+<div class="panel-head">
+
+<div>
+
+<p class="kicker">
+
+SPENDING ANALYTICS
+
+</p>
+
+<h2>
+
+Where your money went
+
+</h2>
+
+</div>
+
+<span id="month-label">
+
+</span>
+
+</div>
+
+<div class="donut-area">
+
+<div
+id="spend-ring"
+class="ring">
+
+<div>
+
+<b id="ring-value">
+
+0%
+
+</b>
+
+<small>
+
+spent
+
+</small>
+
+</div>
+
+</div>
+
+<div
+id="category-list"
+class="category-list">
+
+</div>
+
+</div>
+
+</article>
+
+</section>
+<section class="lower-grid">
+
+<article class="panel">
+
+<div class="panel-head">
+
+<div>
+
+<p class="kicker">
+
+BUDGET RADAR
+
+</p>
+
+<h2>
+
+Keep categories healthy
+
+</h2>
+
+</div>
+
+<button
+class="text-button"
+id="edit-budget">
+
+Edit limits
+
+</button>
+
+</div>
+
+<div id="budget-list">
+
+</div>
+
+</article>
+
+<article class="panel plan-panel">
+
+<p class="kicker">
+
+MONTHLY PLAN
+
+</p>
+
+<h2>
+
+Salary, goal & leftover
+
+</h2>
+
+<div class="plan-row">
+
+<span>
+
+Monthly salary
+
+</span>
+
+<b id="plan-income">
+
+₹0
+
+</b>
+
+</div>
+
+<div class="plan-row">
+
+<span>
+
+Expenses
+
+</span>
+
+<b id="plan-spend">
+
+₹0
+
+</b>
+
+</div>
+
+<div class="plan-row">
+
+<span>
+
+Saving goal
+
+</span>
+
+<b id="plan-goal">
+
+₹0
+
+</b>
+
+</div>
+
+<div class="plan-total">
+
+<span>
+
+Free to use
+
+</span>
+
+<b id="plan-left">
+
+₹0
+
+</b>
+
+</div>
+
+<button
+id="salary-edit-2"
+class="soft wide">
+
+Update my plan
+
+</button>
+
+</article>
+
+</section>
+
+<section class="panel activity">
+
+<div class="panel-head">
+
+<div>
+
+<p class="kicker">
+
+ACTIVITY
+
+</p>
+
+<h2>
+
+Recent expenses
+
+</h2>
+
+</div>
+
+</div>
+
+<div id="transaction-list">
+
+</div>
+
+</section>
+
+</main>
+
+<dialog id="salary-dialog">
+
+<form id="salary-form">
+
+<p class="kicker">
+
+WELCOME TO SPEND SPLASH
+
+</p>
+
+<h2>
+
+What is your monthly salary?
+
+</h2>
+
+<p>
+
+Your salary is private and stays in this browser.
+Each expense will be deducted from it instantly.
+
+</p>
+
+<label>
+
+Monthly salary (INR)
+
+<input
+id="starting-salary"
+type="number"
+required
+min="1"
+placeholder="e.g. 18000">
+
+</label>
+
+<label>
+
+Monthly savings goal (optional)
+
+<input
+id="starting-goal"
+type="number"
+min="0"
+placeholder="e.g. 2000">
+
+</label>
+
+<button>
+
+Build my plan
+
+</button>
+
+</form>
+
+</dialog>
+
+<dialog id="expense-dialog">
+
+<form id="manual-form">
+
+<p class="kicker">
+
+NEW EXPENSE
+
+</p>
+
+<h2>
+
+Where did your money go?
+
+</h2>
+
+<label>
+
+Expense name
+
+<input
+id="manual-name"
+required
+placeholder="e.g. Dinner with friends">
+
+</label>
+
+<label>
+
+Category
+
+<select id="manual-category">
+
+</select>
+
+</label>
+
+<label>
+
+Amount (INR)
+
+<input
+id="manual-amount"
+required
+type="number"
+min="1"
+step="1"
+placeholder="e.g. 450">
+
+</label>
+
+<menu>
+
+<button
+id="cancel-expense"
+type="button"
+class="ghost">
+
+Cancel
+
+</button>
+
+<button>
+
+Add & update balance
+
+</button>
+
+</menu>
+
+</form>
+
+</dialog>
+
+<dialog id="plan-dialog">
+
+<form id="plan-form">
+
+<p class="kicker">
+
+YOUR MONTHLY PLAN
+
+</p>
+
+<h2>
+
+Update your numbers
+
+</h2>
+
+<label>
+
+Monthly salary (INR)
+
+<input
+id="income-input"
+type="number"
+min="1">
+
+</label>
+
+<label>
+
+Monthly savings goal (INR)
+
+<input
+id="goal-input"
+type="number"
+min="0">
+
+</label>
+
+<menu>
+
+<button
+type="button"
+id="cancel-plan"
+class="ghost">
+
+Cancel
+
+</button>
+
+<button>
+
+Save changes
+
+</button>
+
+</menu>
+
+</form>
+
+</dialog>
+
+<dialog id="budget-dialog">
+
+<form id="budget-form">
+
+<p class="kicker">
+
+BUDGET RADAR
+
+</p>
+
+<h2>
+
+Set category limits
+
+</h2>
+
+<div id="budget-fields">
+
+</div>
+
+<menu>
+
+<button
+type="button"
+id="cancel-budget"
+class="ghost">
+
+Cancel
+
+</button>
+
+<button>
+
+Save limits
+
+</button>
+
+</menu>
+
+</form>
+
+</dialog>
+
+<script src="app.js"></script>
+
+</body>
+
+</html>

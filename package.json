@@ -1,0 +1,9 @@
+{
+  "name": "spend-splash-ai",
+  "version": "1.0.0",
+  "private": true,
+  "description": "AI Powered Personal Expense Tracker",
+  "engines": {
+    "node": ">=20"
+  }
+}
