@@ -4,6 +4,6 @@
   "private": true,
   "description": "AI Powered Personal Expense Tracker",
   "engines": {
-    "node": "20.x"
+    "node": "24.x"
   }
 }
