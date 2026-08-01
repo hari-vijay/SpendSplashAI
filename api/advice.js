@@ -87,7 +87,7 @@ const response = await fetch(
       "X-Title": "Spend Splash AI"
     },
     body: JSON.stringify({
-      model: "deepseek/deepseek-chat-v3.1:free",
+      model: "google/gemma-4-31b:free",
       messages: [
         {
           role: "user",
