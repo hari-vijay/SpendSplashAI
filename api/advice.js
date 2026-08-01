@@ -88,7 +88,7 @@ Instructions
             },
           ],
           temperature: 0.5,
-          max_tokens: 180,
+         max_tokens: 400,
           provider: {
             allow_fallbacks: true,
           },
@@ -111,13 +111,18 @@ Instructions
       });
     }
 
-    const answer = data?.choices?.[0]?.message?.content;
+    console.log("FULL RESPONSE:");
+console.log(JSON.stringify(data, null, 2));
+
+const answer =
+  data?.choices?.[0]?.message?.content ||
+  data?.choices?.[0]?.text ||
+  data?.choices?.[0]?.delta?.content ||
+  "";
 
     if (!answer) {
-      return res.status(500).json({
-        error: "AI returned an empty response.",
-      });
-    }
+  return res.status(500).json(data);
+}
 
     return res.status(200).json({
       answer: answer.trim(),
