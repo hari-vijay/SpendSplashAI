@@ -87,7 +87,7 @@ const response = await fetch(
       "X-Title": "Spend Splash AI"
     },
     body: JSON.stringify({
-      model: "google/gemma-4-31b:free",
+      model: "google/gemma-4-31b-it:free",
       messages: [
         {
           role: "user",
