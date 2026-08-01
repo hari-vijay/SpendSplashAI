@@ -1,17 +1,17 @@
 :root{
 
---ink:#172523;
---muted:#6c7c78;
---paper:#f3f7f5;
---panel:#fff;
+--ink:#F5F7F6;
+--muted:#A7BBB6;
+--paper:#071715;
+--panel:#102E2B;
 
---green:#0a6254;
---mint:#d9f2e8;
+--green:#18A57C;
+--mint:#183D38;
 
---line:#e3ebe7;
+--line:#234741;
 
---orange:#ef9a49;
---red:#d85c56;
+--orange:#F4C95D;
+--red:#FF6B6B;
 
 }
 
@@ -26,14 +26,8 @@ body{
 margin:0;
 
 background:
-radial-gradient(
-circle at 80% 0,
-#d7f4e9 0,
-transparent 26rem
-),
-var(--paper);
-
-color:var(--ink);
+radial-gradient(circle at 80% 0,#11453d 0,transparent 28rem),
+linear-gradient(180deg,#071715,#0d2320);
 
 font:
 15px/1.45
@@ -290,9 +284,11 @@ color:#b8ebdf;
 
 .health-pill{
 
-background:#e0f8ba;
+background:#1B5A4A;
 
-color:#275a31;
+color:#D7FFE9;
+
+
 
 border-radius:99px;
 
@@ -453,15 +449,16 @@ margin-bottom:19px;
 
 .panel{
 
-background:var(--panel);
+background:#102E2B;
 
-border:1px solid var(--line);
+border:1px solid #234741;
+
+box-shadow:0 18px 40px rgba(0,0,0,.35);
 
 border-radius:19px;
 
 padding:23px;
 
-box-shadow:0 5px 15px #17362b08;
 
 }
 
@@ -704,11 +701,14 @@ display:flex;
 justify-content:space-between;
 align-items:center;
 padding:14px 16px;
-background:#f7fbf9;
 border-radius:12px;
-border:1px solid #e2ece8;
 font-size:.92rem;
 transition:.25s;
+background:#163A36;
+
+border:1px solid #28544D;
+
+color:#fff;
 }
 
 .category-item:hover{
@@ -772,7 +772,7 @@ color:var(--muted);
 
 height:7px;
 
-background:#edf1ef;
+background:#24443F;
 
 border-radius:99px;
 
@@ -894,7 +894,7 @@ width:35px;
 
 border-radius:10px;
 
-background:var(--mint);
+background:#184640;
 
 display:grid;
 
@@ -921,9 +921,11 @@ select{
 
 width:100%;
 
-border:1px solid #d7e0dc;
+background:#163A36;
 
-background:#fff;
+color:#fff;
+
+border:1px solid #29564E;
 
 border-radius:9px;
 
@@ -931,6 +933,9 @@ padding:11px;
 
 font:inherit;
 
+}
+input::placeholder{
+color:#9EB4AF;
 }
 
 dialog{
@@ -957,6 +962,9 @@ box-shadow:
 25px
 70px
 #001b1644;
+background:#102E2B;
+
+color:#fff;
 
 }
 
@@ -1105,6 +1113,7 @@ width:120px;
 height:91px;
 
 width:91px;
+background:#102E2B;
 
 }
 
@@ -1209,8 +1218,9 @@ transform:translateY(0);
 
 .delete-expense{
     border:none;
-    background:#ffe9e9;
-    color:#d62828;
+    background:#442020;
+
+color:#FF7A7A;
     width:34px;
     height:34px;
     border-radius:8px;
@@ -1219,8 +1229,9 @@ transform:translateY(0);
 }
 
 .delete-expense:hover{
-    background:#d62828;
-    color:white;
+   background:#D62828;
+
+color:#fff;
 }
 .ai-panel,
 .panel{
