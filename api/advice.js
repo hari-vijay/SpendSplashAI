@@ -6,13 +6,13 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
+ const apiKey = process.env.OPENROUTER_API_KEY;
 
-  if (!apiKey) {
-    return res.status(500).json({
-      error: "GEMINI_API_KEY is missing. Add it in your Vercel Environment Variables."
-    });
-  }
+if (!apiKey) {
+  return res.status(500).json({
+    error: "OPENROUTER_API_KEY is missing. Add it in your Vercel Environment Variables."
+  });
+}
 
   try {
     const body =
@@ -76,32 +76,29 @@ Instructions
 
 
     console.log(prompt);
-    const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          contents: [
-            {
-              role: "user",
-              parts: [
-                {
-                  text: prompt
-                }
-              ]
-            }
-          ],
-          generationConfig: {
-            temperature: 0.5,
-            maxOutputTokens: 180
-          }
-        })
-      }
-    );
-
+const response = await fetch(
+  "https://openrouter.ai/api/v1/chat/completions",
+  {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+      "HTTP-Referer": "https://spend-splash-ai.vercel.app",
+      "X-Title": "Spend Splash AI"
+    },
+    body: JSON.stringify({
+      model: "deepseek/deepseek-chat-v3.1:free",
+      messages: [
+        {
+          role: "user",
+          content: prompt
+        }
+      ],
+      temperature: 0.5,
+      max_tokens: 180
+    })
+  }
+);
     const data = await response.json();
     console.log(JSON.stringify(data, null, 2));
 
@@ -111,12 +108,12 @@ Instructions
       return res.status(response.status).json({
         error:
           data?.error?.message ||
-          "Gemini API request failed."
+          "OpenRouter API request failed."
       });
     }
 
     const answer =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text;
+  data?.choices?.[0]?.message?.content;
 
     if (!answer) {
       console.error(data);
