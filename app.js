@@ -1,3 +1,5 @@
+
+
 const categories = {
   Food: ["grocery", "swiggy", "zomato", "restaurant", "cafe", "coffee", "food"],
   Transport: ["uber", "ola", "metro", "fuel", "petrol", "bus", "train"],
@@ -49,7 +51,7 @@ const $ = (selector) => {
       reset() {},
       focus() {},
       showModal() {},
-      close() {}
+      close() {},
     };
   }
 
@@ -87,7 +89,6 @@ function totals() {
 }
 
 function render() {
-
   const spent = total();
 
   const left = balance();
@@ -117,15 +118,15 @@ function render() {
       }.`
     : "Add monthly salary to start tracking.";
 
- $("#spent-line").style.width = percent + "%";
+  $("#spent-line").style.width = percent + "%";
 
-if (percent >= 100) {
-    $("#spent-line").style.background = "#e53935"; // Red
-} else if (percent >= 80) {
-    $("#spent-line").style.background = "#f4b400"; // Orange
-} else {
-    $("#spent-line").style.background = "#2ecc71"; // Green
-}
+  if (percent >= 100) {
+    $("#spent-line").style.background = "#e53935";
+  } else if (percent >= 80) {
+    $("#spent-line").style.background = "#f4b400";
+  } else {
+    $("#spent-line").style.background = "#2ecc71";
+  }
 
   $("#spent-label").textContent =
     `${money(spent)} spent (${percent}%)`;
@@ -134,54 +135,36 @@ if (percent >= 100) {
     `${money(state.income)} salary`;
 
   if (percent >= 100) {
-
     $("#health-pill").textContent = "Budget Exceeded";
     $("#health-pill").style.background = "#ffebee";
     $("#health-pill").style.color = "#c62828";
 
     $("#balance-main").style.color = "#ff6b6b";
-
     $("#balance-story").style.color = "#ffd6d6";
-
     $("#spent-label").style.color = "#ffb3b3";
-
     $("#salary-label").style.color = "#ffb3b3";
-
     $("#spent-line").style.background = "#e53935";
-
-} else if (percent >= 80) {
-
+  } else if (percent >= 80) {
     $("#health-pill").textContent = "Watch Spending";
     $("#health-pill").style.background = "#fff3cd";
     $("#health-pill").style.color = "#8a5a00";
 
     $("#balance-main").style.color = "#ffffff";
-
     $("#balance-story").style.color = "#c6f2e8";
-
     $("#spent-label").style.color = "#c6f2e8";
-
     $("#salary-label").style.color = "#c6f2e8";
-
     $("#spent-line").style.background = "#f4b400";
-
-} else {
-
+  } else {
     $("#health-pill").textContent = "On Track";
     $("#health-pill").style.background = "#d9f2e8";
     $("#health-pill").style.color = "#0a6254";
 
     $("#balance-main").style.color = "#ffffff";
-
     $("#balance-story").style.color = "#c6f2e8";
-
     $("#spent-label").style.color = "#c6f2e8";
-
     $("#salary-label").style.color = "#c6f2e8";
-
     $("#spent-line").style.background = "#2ecc71";
-
-}
+  }
 
   $("#ring-value").textContent =
     percent + "%";
@@ -208,14 +191,15 @@ if (percent >= 100) {
       .sort((a, b) => b[1] - a[1])
       .slice(0, 4)
       .map(
-        ([category, value], i) =>
-          `<div class="category-item">
-              <span>
-                <i style="background:${colors[i]}"></i>
-                ${category}
-              </span>
-              <b>${money(value)}</b>
-           </div>`
+        ([category, value], i) => `
+          <div class="category-item">
+            <span>
+              <i style="background:${colors[i]}"></i>
+              ${category}
+            </span>
+            <b>${money(value)}</b>
+          </div>
+        `
       )
       .join("") ||
     "<small>No categories yet.</small>";
@@ -223,7 +207,6 @@ if (percent >= 100) {
   $("#budget-list").innerHTML =
     Object.entries(state.budgets)
       .map(([category, budget]) => {
-
         const spentAmount = byCategory[category];
 
         const percentage = Math.min(
@@ -232,28 +215,23 @@ if (percent >= 100) {
         );
 
         return `
-        <div class="budget-row">
-
+          <div class="budget-row">
             <div>
-
-                <span>
-                    ${category}
-                    <small>
-                        ${money(spentAmount)} / ${money(budget)}
-                    </small>
-                </span>
-
-                <b>${percentage}%</b>
-
+              <span>
+                ${category}
+                <small>
+                  ${money(spentAmount)} / ${money(budget)}
+                </small>
+              </span>
+              <b>${percentage}%</b>
             </div>
 
-            <div class="track ${spentAmount > budget ? "over" : ""}">
-
-                <i style="width:${percentage}%"></i>
-
+            <div class="track ${
+              spentAmount > budget ? "over" : ""
+            }">
+              <i style="width:${percentage}%"></i>
             </div>
-
-        </div>
+          </div>
         `;
       })
       .join("");
@@ -269,112 +247,118 @@ if (percent >= 100) {
 
   $("#plan-left").textContent =
     money(left);
-$("#transaction-list").innerHTML =
-  [...state.expenses]
-    .reverse()
-    .map((expense, index) => `
-      <div class="transaction">
 
-        <span class="icon">
-          ${expense.category[0]}
-        </span>
+  $("#transaction-list").innerHTML =
+    [...state.expenses]
+      .reverse()
+      .map(
+        (expense, index) => `
+        <div class="transaction">
 
-        <span>
-          ${expense.name}
-          <small>
-            ${expense.category} ·
-            ${new Date(expense.date + "T00:00:00").toLocaleDateString("en-IN", {
-              day: "numeric",
-              month: "short",
-            })}
-          </small>
-        </span>
+          <span class="icon">
+            ${expense.category[0]}
+          </span>
 
-        <div class="transaction-actions">
+          <span>
+            ${expense.name}
+            <small>
+              ${expense.category} ·
+              ${new Date(
+                expense.date + "T00:00:00"
+              ).toLocaleDateString("en-IN", {
+                day: "numeric",
+                month: "short",
+              })}
+            </small>
+          </span>
 
-          <b>
-            -${money(expense.amount)}
-          </b>
+          <div class="transaction-actions">
+            <b>
+              -${money(expense.amount)}
+            </b>
 
-          <button
-            class="delete-expense"
-            data-index="${state.expenses.length - 1 - index}">
-            🗑
-          </button>
+            <button
+              class="delete-expense"
+              data-index="${
+                state.expenses.length - 1 - index
+              }">
+              🗑
+            </button>
+          </div>
 
         </div>
-
-      </div>
-    `)
-    .join("") ||
-  "<p>No expenses yet — add one above.</p>";
+      `
+      )
+      .join("") ||
+    "<p>No expenses yet — add one above.</p>";
 
   suggest(left, spent, top, byCategory);
 }
-function suggest(left, spent, top, byCategory) {
 
-  const label = document.querySelector(".ai-panel .kicker");
+function suggest(left, spent, top, byCategory) {
+  const label = document.querySelector(
+    ".ai-panel .kicker"
+  );
 
   if (label) {
     label.textContent = "SPEND SPLASH COACH";
   }
 
   const over = Object.entries(byCategory).find(
-    ([category, value]) => value > state.budgets[category]
+    ([category, value]) =>
+      value > state.budgets[category]
   );
 
   let title;
   let body;
 
   if (!state.income) {
-
     title = "Start with monthly salary";
 
     body =
       "Add your salary once. Every expense will then update your remaining balance.";
-
   } else if (over) {
-
     title = `${over[0]} is over budget`;
 
-    body =
-      `You spent ${money(over[1])} in ${over[0]}. Pause optional expenses in that category until next month.`;
-
+    body = `You spent ${money(
+      over[1]
+    )} in ${
+      over[0]
+    }. Pause optional expenses in that category until next month.`;
   } else if (left < 0) {
-
     title = "You are over your plan";
 
-    body =
-      `Your balance is ${money(left)}. Focus on necessary spending until your next salary.`;
-
+    body = `Your balance is ${money(
+      left
+    )}. Focus on necessary spending until your next salary.`;
   } else {
-
     title = `${money(left)} is available`;
 
-    body =
-      `You have spent ${money(spent)} so far. Keep a part of the balance for essentials and your savings goal.`;
-
+    body = `You have spent ${money(
+      spent
+    )} so far. Keep a part of the balance for essentials and your savings goal.`;
   }
 
   $("#ai-summary").textContent = state.income
-    ? `${state.expenses.length} expense${state.expenses.length === 1 ? "" : "s"} tracked. Your plan updates immediately.`
+    ? `${state.expenses.length} expense${
+        state.expenses.length === 1 ? "" : "s"
+      } tracked. Your plan updates immediately.`
     : "Your personal spending summary will appear here.";
 
   $("#ai-result").innerHTML = `
-      <span>SMART CHECK-IN</span>
-      <strong>${title}</strong>
-      <p>${body}</p>
+    <span>SMART CHECK-IN</span>
+    <strong>${title}</strong>
+    <p>${body}</p>
   `;
 
-  const askRow = document.querySelector(".ask-row");
+  const askRow =
+    document.querySelector(".ask-row");
 
   if (askRow) {
     askRow.style.display = "none";
   }
 }
-
 function categoryFor(text) {
-
   text = text.toLowerCase();
 
   return (
@@ -387,7 +371,6 @@ function categoryFor(text) {
 }
 
 function addExpense(expense) {
-
   state.expenses.push(expense);
 
   save();
@@ -396,7 +379,6 @@ function addExpense(expense) {
 }
 
 function openExpense() {
-
   $("#manual-category").innerHTML =
     Object.keys(categories)
       .map(
@@ -413,7 +395,6 @@ function openExpense() {
 }
 
 function openPlan() {
-
   $("#income-input").value =
     state.income || "";
 
@@ -429,21 +410,15 @@ $("#cancel-expense").onclick = () =>
   $("#expense-dialog").close();
 
 $("#manual-form").onsubmit = (e) => {
-
   e.preventDefault();
 
   addExpense({
-
     name: $("#manual-name").value.trim(),
-
     amount: +$("#manual-amount").value,
-
     category: $("#manual-category").value,
-
     date: new Date()
       .toISOString()
       .slice(0, 10),
-
   });
 
   $("#expense-dialog").close();
@@ -453,18 +428,15 @@ $("#manual-form").onsubmit = (e) => {
 };
 
 $("#quick-form").onsubmit = (e) => {
-
   e.preventDefault();
 
   const text = $("#quick-input").value;
 
-  const match =
-    text.match(
-      /(\d+(?:,\d{3})*(?:\.\d{1,2})?)/
-    );
+  const match = text.match(
+    /(\d+(?:,\d{3})*(?:\.\d{1,2})?)/
+  );
 
   if (!match) {
-
     $("#parse-feedback").textContent =
       "Add an amount, for example: Coffee 120";
 
@@ -472,7 +444,6 @@ $("#quick-form").onsubmit = (e) => {
   }
 
   addExpense({
-
     name:
       text.replace(match[0], "").trim() ||
       "Expense",
@@ -484,7 +455,6 @@ $("#quick-form").onsubmit = (e) => {
     date: new Date()
       .toISOString()
       .slice(0, 10),
-
   });
 
   e.target.reset();
@@ -498,16 +468,17 @@ $("#quick-form").onsubmit = (e) => {
     $(id).onclick = openPlan;
   }
 );
+
 $("#cancel-plan").onclick = () =>
   $("#plan-dialog").close();
 
 $("#plan-form").onsubmit = (e) => {
-
   e.preventDefault();
 
   state.income = +$("#income-input").value;
 
-  state.goal = +$("#goal-input").value || 0;
+  state.goal =
+    +$("#goal-input").value || 0;
 
   save();
 
@@ -517,12 +488,13 @@ $("#plan-form").onsubmit = (e) => {
 };
 
 $("#salary-form").onsubmit = (e) => {
-
   e.preventDefault();
 
-  state.income = +$("#starting-salary").value;
+  state.income =
+    +$("#starting-salary").value;
 
-  state.goal = +$("#starting-goal").value || 0;
+  state.goal =
+    +$("#starting-goal").value || 0;
 
   save();
 
@@ -532,7 +504,6 @@ $("#salary-form").onsubmit = (e) => {
 };
 
 $("#edit-budget").onclick = () => {
-
   $("#budget-fields").innerHTML =
     Object.entries(state.budgets)
       .map(
@@ -559,16 +530,14 @@ $("#cancel-budget").onclick = () =>
   $("#budget-dialog").close();
 
 $("#budget-form").onsubmit = (e) => {
-
   e.preventDefault();
 
   document
     .querySelectorAll("[data-budget]")
     .forEach((input) => {
-
-      state.budgets[input.dataset.budget] =
-        +input.value;
-
+      state.budgets[
+        input.dataset.budget
+      ] = +input.value;
     });
 
   save();
@@ -579,13 +548,11 @@ $("#budget-form").onsubmit = (e) => {
 };
 
 $("#reset-data").onclick = () => {
-
   if (
     confirm(
       "Clear salary, goals, and all expenses?"
     )
   ) {
-
     state = blank();
 
     save();
@@ -599,45 +566,48 @@ $("#reset-data").onclick = () => {
 render();
 
 document.addEventListener("click", (e) => {
+  if (
+    !e.target.classList.contains(
+      "delete-expense"
+    )
+  )
+    return;
 
-  if (!e.target.classList.contains("delete-expense")) return;
-
-  const index = Number(e.target.dataset.index);
+  const index = Number(
+    e.target.dataset.index
+  );
 
   if (confirm("Delete this expense?")) {
-
     state.expenses.splice(index, 1);
 
     save();
 
     render();
-
   }
-
 });
+
 if (!state.income) {
-
   setTimeout(() => {
-
     $("#salary-dialog").showModal();
-
   }, 120);
-
 }
-setTimeout(() => {
 
-  const panel = document.querySelector(".ai-panel");
+setTimeout(() => {
+  const panel =
+    document.querySelector(".ai-panel");
 
   if (!panel) return;
 
-  const kicker = panel.querySelector(".kicker");
+  const kicker =
+    panel.querySelector(".kicker");
 
   if (kicker) {
     kicker.innerHTML =
       'SPEND SPLASH AI <span class="live">CHAT</span>';
   }
 
-  const row = panel.querySelector(".ask-row");
+  const row =
+    panel.querySelector(".ask-row");
 
   if (!row) return;
 
@@ -646,36 +616,33 @@ setTimeout(() => {
   row.insertAdjacentHTML(
     "afterend",
     `
-    <form id="ai-chat-form" class="splash-chat">
+<form id="ai-chat-form" class="splash-chat">
 
-      <input
-        id="ai-chat-input"
-        maxlength="500"
-        placeholder="Ask about my salary, balance or savings...">
+  <input
+    id="ai-chat-input"
+    maxlength="500"
+    placeholder="Ask about my salary, balance or savings...">
 
-      <button>
+  <button type="submit">
+    Ask
+  </button>
 
-        Ask
+</form>
 
-      </button>
+<div
+  id="ai-chat-answer"
+  class="splash-answer"
+  aria-live="polite">
+</div>
 
-    </form>
+<small
+  id="ai-chat-status"
+  class="splash-status">
 
-    <div
-      id="ai-chat-answer"
-      class="splash-answer"
-      aria-live="polite">
+  AI chat works after the app is deployed.
 
-    </div>
-
-    <small
-      id="ai-chat-status"
-      class="splash-status">
-
-      AI chat works after the app is deployed.
-
-    </small>
-    `
+</small>
+`
   );
 
   const css = document.createElement("style");
@@ -684,7 +651,7 @@ setTimeout(() => {
 .splash-chat{
 display:flex;
 gap:8px;
-margin-top:12px
+margin-top:12px;
 }
 
 .splash-chat input{
@@ -694,7 +661,7 @@ border:0;
 border-radius:9px;
 padding:10px;
 background:#fff;
-color:#102e2b
+color:#102e2b;
 }
 
 .splash-chat button{
@@ -704,7 +671,13 @@ padding:0 14px;
 background:#f3cb65;
 color:#173a34;
 font-weight:800;
-cursor:pointer
+cursor:pointer;
+transition:.25s;
+}
+
+.splash-chat button:disabled{
+opacity:.6;
+cursor:not-allowed;
 }
 
 .splash-answer{
@@ -715,117 +688,160 @@ border:1px solid #ffffff1c;
 background:#ffffff0d;
 border-radius:10px;
 color:#dbeee9;
-font-size:.82rem
+font-size:.82rem;
 }
 
 .splash-status{
 display:block;
 color:#9ac7bc;
 margin-top:7px;
-font-size:.67rem
+font-size:.67rem;
 }
 
 @media(max-width:700px){
-
 .splash-chat button{
-padding:0 11px
+padding:0 11px;
 }
-
 }
 `;
-
   document.head.appendChild(css);
 
   const form = $("#ai-chat-form");
-
   const input = $("#ai-chat-input");
-
   const answer = $("#ai-chat-answer");
-
   const status = $("#ai-chat-status");
 
   if (!form) return;
 
+  // ---------- PART 3 STARTS HERE ----------
   form.onsubmit = async (e) => {
-
     e.preventDefault();
 
     const question = input.value.trim();
 
     if (!question) return;
 
+    // Clear input immediately
+    
+    // Disable button
+    const button = form.querySelector("button");
+    button.disabled = true;
+    button.textContent = "Thinking...";
+
     answer.style.display = "block";
 
-    answer.textContent = "Thinking...";
+    // Animated Thinking...
+    let dots = 0;
+
+    const loader = setInterval(() => {
+      dots = (dots + 1) % 4;
+      answer.textContent =
+        "Thinking" + ".".repeat(dots);
+    }, 350);
 
     status.textContent =
       "Analysing your current Spend Splash budget...";
 
     const context = {
-
       monthlySalary: state.income,
-
       savingsGoal: state.goal,
-
       totalExpenses: total(),
-
       remainingBalance: balance(),
-
       categories: totals(),
-
       recentExpenses: state.expenses.slice(-12),
-
     };
 
     try {
-
       const response = await fetch("/api/advice", {
-
         method: "POST",
 
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type":
+            "application/json",
         },
 
         body: JSON.stringify({
-
           question,
-
           context,
-
         }),
-
       });
 
-     const body = await response.json();
+      const body =
+        await response.json();
+        input.value = "";
+    input.focus();
 
-console.log("Status:", response.status);
-console.log("Body:", body);
 
-if (!response.ok) {
-    throw new Error(JSON.stringify(body));
-}
+      console.log(
+        "Status:",
+        response.status
+      );
 
+      console.log("Body:", body);
+
+      if (!response.ok) {
+        throw new Error(
+          JSON.stringify(body)
+        );
+      }
+
+      // Stop loader
+      clearInterval(loader);
+
+      // Show answer
       answer.textContent = body.answer;
+      answer.classList.remove("show");
+requestAnimationFrame(() => {
+    answer.classList.add("show");
+});
+
+      // Auto Scroll
+      answer.scrollIntoView({
+        behavior: "smooth",
+        block: "nearest",
+      });
+
+
+      // Enable button
+      
+      button.disabled = false;
+      button.textContent = "Ask";
 
       status.textContent =
         "AI answer based on your current budget.";
-
     } catch (error) {
-    console.error(error);
+      console.error(error);
 
-    const responseText = await error?.response?.text?.().catch(() => null);
+      clearInterval(loader);
 
-    answer.style.display = "block";
-    answer.textContent = error.message || "Unknown error";
+      let responseText = null;
 
-    if (responseText) {
-        answer.textContent += "\n\n" + responseText;
+      try {
+        responseText =
+          await error?.response
+            ?.text?.();
+      } catch (_) {}
+
+      answer.style.display = "block";
+
+      answer.textContent =
+        error.message ||
+        "Something went wrong.";
+
+      if (responseText) {
+        answer.textContent +=
+          "\n\n" + responseText;
+      }
+
+      // Enable button again
+      input.value = "";
+input.focus();
+      button.disabled = false;
+      button.textContent = "Ask";
+
+      status.textContent =
+        "Request failed.";
     }
-
-    status.textContent = "Request failed.";
-}
-
   };
 
 }, 0);
