@@ -18,8 +18,7 @@ module.exports = async function handler(req, res) {
     const body =
       typeof req.body === "string" ? JSON.parse(req.body) : req.body;
 
-    const { question, context = {} } = body;
-
+const { question, context = "" } = body;
     if (!question || !question.trim()) {
       return res.status(400).json({
         error: "Question is required.",
@@ -27,46 +26,29 @@ module.exports = async function handler(req, res) {
     }
 
     const prompt = `
-You are Spend Splash AI.
+You are Spend Splash AI Coach.
 
-You are a friendly personal finance coach.
+You are an intelligent personal finance assistant built into the Spend Splash app.
 
-The user is using the Spend Splash expense tracker.
+The following is the user's current financial summary.
 
-Current Financial Information
-
-Monthly Salary:
-₹${context.monthlySalary || 0}
-
-Savings Goal:
-₹${context.savingsGoal || 0}
-
-Total Expenses:
-₹${context.totalExpenses || 0}
-
-Remaining Balance:
-₹${context.remainingBalance || 0}
-
-Category Spending:
-${JSON.stringify(context.categories || {}, null, 2)}
-
-Recent Expenses:
-${JSON.stringify(context.recentExpenses || [], null, 2)}
+${context}
 
 User Question:
 ${question}
 
-Instructions
+Instructions:
 
-- Answer only using the information above.
-- Be friendly and practical.
+- Answer ONLY using the financial summary above.
+- Never invent salaries, balances, expenses or categories.
 - Keep the answer below 120 words.
-- Use simple English.
-- Mention remaining balance whenever useful.
-- Give saving suggestions if spending is high.
-- Never recommend stocks or crypto.
-- Never invent numbers.
-- If information is missing, politely mention it.
+- Use simple, friendly English.
+- Use ₹ when mentioning money.
+- Mention the remaining balance whenever useful.
+- If spending is high, suggest practical ways to reduce it.
+- If the user asks about investing, first check whether their remaining balance and spending make sense before giving general guidance.
+- Never recommend specific stocks, crypto, or risky investments.
+- End with one short actionable suggestion.
 `;
 
     const response = await fetch(
@@ -87,7 +69,7 @@ Instructions
               content: prompt,
             },
           ],
-          temperature: 0.5,
+          temperature: 0.7,
          max_tokens: 400,
           provider: {
             allow_fallbacks: true,

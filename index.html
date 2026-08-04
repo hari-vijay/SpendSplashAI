@@ -345,6 +345,34 @@ class="category-list">
 </article>
 
 </section>
+<section class="panel monthly-graph">
+
+    <div class="panel-head">
+
+        <div>
+
+            <p class="kicker">
+                MONTHLY TREND
+            </p>
+
+            <h2>
+                Expense Trend
+            </h2>
+
+        </div>
+
+        <select id="graph-month-selector">
+
+</select>
+
+    </div>
+
+    <canvas
+        id="expense-chart"
+        height="110">
+    </canvas>
+
+</section>
 <section class="lower-grid">
 
 <article class="panel">
@@ -738,6 +766,8 @@ Save limits
 </form>
 
 </dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script src="app.js"></script>
 

@@ -36,6 +36,8 @@ let state =
   JSON.parse(localStorage.getItem("spend-splash-offline") || "null") ||
   blank();
 
+  let expenseChart = null;
+
 const $ = (selector) => {
   const element = document.querySelector(selector);
 
@@ -86,6 +88,244 @@ function totals() {
         .reduce((sum, expense) => sum + expense.amount, 0),
     ])
   );
+}
+
+
+function renderExpenseChart() {
+
+  const canvas = document.getElementById("expense-chart");
+  if (!canvas) return;
+
+  const selector = document.getElementById("graph-month-selector");
+
+  // Remember selected month
+  const previousSelection = selector.value;
+
+  const months = {};
+
+  state.expenses.forEach(expense => {
+
+   console.log(JSON.stringify(state.expenses, null, 2));
+
+    const d = new Date(expense.date);
+
+    const key = `${d.getFullYear()}-${d.getMonth()}`;
+
+    if (!months[key]) {
+      months[key] = {
+        year: d.getFullYear(),
+        month: d.getMonth()
+      };
+    }
+
+  });
+
+  // Always include current month
+  const now = new Date();
+
+  const currentKey = `${now.getFullYear()}-${now.getMonth()}`;
+
+  if (!months[currentKey]) {
+
+    months[currentKey] = {
+      year: now.getFullYear(),
+      month: now.getMonth()
+    };
+
+  }
+
+  selector.innerHTML = Object.values(months)
+    .sort((a, b) =>
+      b.year - a.year ||
+      b.month - a.month
+    )
+    .map(m => `
+      <option value="${m.year}-${m.month}">
+        ${new Date(m.year, m.month).toLocaleDateString("en-IN", {
+          month: "long",
+          year: "numeric"
+        })}
+      </option>
+    `)
+    .join("");
+
+  // Restore previous selection
+  if (
+    previousSelection &&
+    [...selector.options].some(o => o.value === previousSelection)
+  ) {
+    selector.value = previousSelection;
+  } else {
+    selector.selectedIndex = 0;
+  }
+
+  const [year, month] = selector.value.split("-").map(Number);
+
+  const days = new Date(year, month + 1, 0).getDate();
+
+  const dailyTotals = Array(days).fill(0);
+
+  state.expenses.forEach(expense => {
+
+    const d = new Date(expense.date);
+
+    if (
+      d.getFullYear() === year &&
+      d.getMonth() === month
+    ) {
+      dailyTotals[d.getDate() - 1] += expense.amount;
+    }
+
+  });
+
+  console.log("Month:", year, month);
+console.log("Daily Totals:", dailyTotals);
+  if (!expenseChart) {
+
+  expenseChart = new Chart(canvas, {
+
+    type: "line",
+
+    data: {
+      labels: Array.from({ length: days }, (_, i) => i + 1),
+
+      datasets: [{
+        label: "Expenses",
+        data: dailyTotals,
+        borderColor: "#0a6254",
+        backgroundColor:"rgba(10,98,84,.08)",
+        fill: true,
+        tension: 0.4,
+        pointRadius:5,
+pointHoverRadius:8,
+pointBackgroundColor:"#0a6254",
+pointBorderWidth:2,
+pointBorderColor:"#fff",
+        borderWidth: 4
+      }]
+    },
+
+  options:{
+
+responsive:true,
+
+maintainAspectRatio:false,
+
+animation:{
+duration:1200,
+easing:"easeOutQuart"
+},
+
+interaction:{
+intersect:false,
+mode:"index"
+},
+
+plugins:{
+
+legend:{
+display:false
+},
+
+tooltip:{
+
+backgroundColor:"#0a6254",
+
+titleColor:"#fff",
+
+bodyColor:"#fff",
+
+cornerRadius:12,
+
+padding:12,
+
+displayColors:false,
+
+callbacks:{
+
+label:function(context){
+
+return "₹"+context.parsed.y;
+
+}
+
+}
+
+}
+
+},
+
+elements:{
+
+line:{
+borderWidth:4
+},
+
+point:{
+radius:5,
+hoverRadius:8,
+hitRadius:12
+}
+
+},
+
+scales:{
+
+x:{
+
+grid:{
+display:false
+},
+
+ticks:{
+color:"#6c7c78"
+}
+
+},
+
+y:{
+
+beginAtZero:true,
+
+grid:{
+color:"rgba(0,0,0,.06)"
+},
+
+ticks:{
+color:"#6c7c78",
+callback:function(value){
+return "₹"+value;
+}
+}
+
+}
+
+},
+
+onHover:(event,elements)=>{
+
+event.native.target.style.cursor=
+
+elements.length?"pointer":"default";
+
+}
+
+}
+
+  });
+
+} else {
+
+  expenseChart.data.labels =
+    Array.from({ length: days }, (_, i) => i + 1);
+
+  expenseChart.data.datasets[0].data =
+    dailyTotals;
+
+  expenseChart.update();
+
+}
+
 }
 
 function render() {
@@ -248,51 +488,97 @@ function render() {
   $("#plan-left").textContent =
     money(left);
 
+ const allTransactions = [...state.expenses].reverse();
+
+const visibleTransactions =
+  window.showAllTransactions
+    ? allTransactions
+    : allTransactions.slice(0, 5);
+
+$("#transaction-list").innerHTML =
+  visibleTransactions
+    .map(
+      (expense, index) => `
+
+<div class="transaction">
+
+  <span class="icon">
+    ${expense.category[0]}
+  </span>
+
+  <span>
+
+    ${expense.name}
+
+    <small>
+
+      ${expense.category} ·
+
+      ${new Date(
+        expense.date + "T00:00:00"
+      ).toLocaleDateString("en-IN", {
+        day: "numeric",
+        month: "short",
+      })}
+
+    </small>
+
+  </span>
+
+  <div class="transaction-actions">
+
+    <b>
+      -${money(expense.amount)}
+    </b>
+
+    <button
+      class="delete-expense"
+      data-index="${
+        state.expenses.length -
+        1 -
+        (window.showAllTransactions
+          ? index
+          : index)
+      }">
+
+      🗑
+
+    </button>
+
+  </div>
+
+</div>
+
+`
+    )
+    .join("");
+
+if (!allTransactions.length) {
+
   $("#transaction-list").innerHTML =
-    [...state.expenses]
-      .reverse()
-      .map(
-        (expense, index) => `
-        <div class="transaction">
-
-          <span class="icon">
-            ${expense.category[0]}
-          </span>
-
-          <span>
-            ${expense.name}
-            <small>
-              ${expense.category} ·
-              ${new Date(
-                expense.date + "T00:00:00"
-              ).toLocaleDateString("en-IN", {
-                day: "numeric",
-                month: "short",
-              })}
-            </small>
-          </span>
-
-          <div class="transaction-actions">
-            <b>
-              -${money(expense.amount)}
-            </b>
-
-            <button
-              class="delete-expense"
-              data-index="${
-                state.expenses.length - 1 - index
-              }">
-              🗑
-            </button>
-          </div>
-
-        </div>
-      `
-      )
-      .join("") ||
     "<p>No expenses yet — add one above.</p>";
 
-  suggest(left, spent, top, byCategory);
+} else if (allTransactions.length > 5) {
+
+  $("#transaction-list").innerHTML += `
+
+<div class="view-more-wrapper">
+
+<button id="toggle-transactions">
+
+${window.showAllTransactions ? "Show Less ▲" : "View More ▼"}
+
+</button>
+
+</div>
+
+`;
+
+}
+
+suggest(left, spent, top, byCategory);
+
+renderExpenseChart();
 }
 
 function suggest(left, spent, top, byCategory) {
@@ -713,7 +999,60 @@ padding:0 11px;
 
   if (!form) return;
 
+
+
+
+
   // ---------- PART 3 STARTS HERE ----------
+
+function buildFinancialContext() {
+
+  const spent = total();
+
+  const left = balance();
+
+  const categoryTotals = totals();
+
+  const topCategory =
+    Object.entries(categoryTotals)
+      .sort((a,b)=>b[1]-a[1])[0];
+
+  return `
+Financial Summary
+
+Salary: ${money(state.income)}
+
+Savings Goal: ${money(state.goal)}
+
+Spent: ${money(spent)}
+
+Remaining Balance: ${money(left)}
+
+Top Category:
+${topCategory ? topCategory[0] : "None"}
+
+Category Spending:
+
+${Object.entries(categoryTotals)
+
+.map(([k,v])=>`${k}: ${money(v)}`)
+
+.join("\n")}
+
+Recent Expenses:
+
+${state.expenses
+
+.slice(-5)
+
+.map(e=>`${e.name} - ${money(e.amount)} (${e.category})`)
+
+.join("\n")}
+
+`;
+
+}
+
   form.onsubmit = async (e) => {
     e.preventDefault();
 
@@ -742,29 +1081,28 @@ padding:0 11px;
     status.textContent =
       "Analysing your current Spend Splash budget...";
 
-    const context = {
-      monthlySalary: state.income,
-      savingsGoal: state.goal,
-      totalExpenses: total(),
-      remainingBalance: balance(),
-      categories: totals(),
-      recentExpenses: state.expenses.slice(-12),
-    };
+ const context = buildFinancialContext();
 
-    try {
-      const response = await fetch("/api/advice", {
-        method: "POST",
+try {
 
-        headers: {
-          "Content-Type":
-            "application/json",
-        },
+  const response = await fetch("/api/advice", {
 
-        body: JSON.stringify({
-          question,
-          context,
-        }),
-      });
+    method: "POST",
+
+    headers: {
+      "Content-Type": "application/json",
+    },
+
+    body: JSON.stringify({
+
+      question,
+
+      context
+
+    }),
+
+  });
+
 
       const body =
         await response.json();
@@ -843,5 +1181,28 @@ input.focus();
         "Request failed.";
     }
   };
+  document.addEventListener("change", (e) => {
+
+  if (e.target.id === "graph-month-selector") {
+
+    renderExpenseChart();
+
+  }
+
+});
+window.showAllTransactions = false;
+
+document.addEventListener("click", (e) => {
+
+  if (e.target.id === "toggle-transactions") {
+
+    window.showAllTransactions =
+      !window.showAllTransactions;
+
+    render();
+
+  }
+
+});
 
 }, 0);
