@@ -96,7 +96,7 @@ function renderExpenseChart() {
   const canvas = document.getElementById("expense-chart");
   if (!canvas) return;
 
-  const selector = document.getElementById("graph-month-selector");
+  const selector = document.getElementById("month-selector");
 
   // Remember selected month
   const previousSelection = selector.value;
@@ -105,7 +105,6 @@ function renderExpenseChart() {
 
   state.expenses.forEach(expense => {
 
-   console.log(JSON.stringify(state.expenses, null, 2));
 
     const d = new Date(expense.date);
 
@@ -178,8 +177,7 @@ function renderExpenseChart() {
 
   });
 
-  console.log("Month:", year, month);
-console.log("Daily Totals:", dailyTotals);
+
   if (!expenseChart) {
 
   expenseChart = new Chart(canvas, {
@@ -329,18 +327,122 @@ elements.length?"pointer":"default";
 }
 
 function render() {
-  const spent = total();
+ // =========================
+// Current Selected Month
+// =========================
 
-  const left = balance();
+const selector = $("#month-selector");
 
-  const byCategory = totals();
+if (!selector.value) {
+    renderExpenseChart();
+}
 
-  const percent = state.income
+
+const [selectedYear, selectedMonth] =
+  $("#month-selector")
+    .value
+    .split("-")
+    .map(Number);
+
+const monthExpenses =
+  state.expenses.filter(expense => {
+
+    const d = new Date(
+      expense.date + "T00:00:00"
+    );
+
+    return (
+      d.getMonth() === selectedMonth &&
+      d.getFullYear() === selectedYear
+    );
+
+  });
+
+// =========================
+// Month Calculations
+// =========================
+
+const spent =
+  monthExpenses.reduce(
+    (sum, expense) => sum + expense.amount,
+    0
+  );
+
+const left =
+  state.income - spent;
+
+const byCategory = {};
+
+monthExpenses.forEach(expense => {
+
+  byCategory[expense.category] =
+    (byCategory[expense.category] || 0) +
+    expense.amount;
+
+});
+
+const percent =
+  state.income
     ? Math.min(
         100,
-        Math.round((spent / state.income) * 100)
+        Math.round(
+          (spent / state.income) * 100
+        )
       )
     : 0;
+
+    // =========================
+// Spending Forecast
+// =========================
+
+const today = new Date().getDate();
+
+const daysInMonth = new Date(
+  new Date().getFullYear(),
+  new Date().getMonth() + 1,
+  0
+).getDate();
+
+const averagePerDay =
+  today > 0 ? spent / today : 0;
+
+const forecastSpend =
+  Math.round(averagePerDay * daysInMonth);
+
+const forecastBalance =
+  state.income - forecastSpend;
+
+    // =========================
+// Financial Health Score
+// =========================
+
+let healthScore = 100;
+
+// Spending impact
+healthScore -= percent * 0.4;
+
+// Overspending penalty
+if (left < 0) {
+  healthScore -= 20;
+}
+
+// Savings goal not achieved
+if (state.goal > 0 && left < state.goal) {
+  healthScore -= 15;
+}
+
+// Budget violations
+const overBudgetCount = Object.entries(byCategory)
+  .filter(([category, value]) => value > state.budgets[category])
+  .length;
+
+healthScore -= overBudgetCount * 8;
+
+healthScore = Math.max(
+  0,
+  Math.min(100, Math.round(healthScore))
+);
+    
 
   const top = Object.entries(byCategory).sort(
     (a, b) => b[1] - a[1]
@@ -412,11 +514,16 @@ function render() {
   $("#spend-ring").style.background =
     `conic-gradient(#0a6254 0 ${percent}%, #e9efec ${percent}% 100%)`;
 
-  $("#month-label").textContent =
-    new Date().toLocaleDateString("en-IN", {
-      month: "short",
-      year: "numeric",
-    });
+ const selectedDate = new Date(
+  selectedYear,
+  selectedMonth
+);
+
+$("#month-label").textContent =
+  selectedDate.toLocaleDateString("en-IN", {
+    month: "short",
+    year: "numeric",
+  });
 
   const colors = [
     "#0a6254",
@@ -447,7 +554,8 @@ function render() {
   $("#budget-list").innerHTML =
     Object.entries(state.budgets)
       .map(([category, budget]) => {
-        const spentAmount = byCategory[category];
+        const spentAmount =
+  byCategory[category] || 0;
 
         const percentage = Math.min(
           100,
@@ -485,16 +593,28 @@ function render() {
   $("#plan-goal").textContent =
     "-" + money(state.goal);
 
-  $("#plan-left").textContent =
-    money(left);
+ if (left >= 0) {
 
- const allTransactions = [...state.expenses].reverse();
+    $(".plan-total span").textContent = "Available Balance";
+    $("#plan-left").textContent = money(left);
+    $("#plan-left").style.color = "#0a6254";
+
+} else {
+
+    $(".plan-total span").textContent = "Over Budget";
+    $("#plan-left").textContent = money(Math.abs(left));
+    $("#plan-left").style.color = "#d32f2f";
+
+}
+
+
+const allTransactions =
+  [...monthExpenses].reverse();
 
 const visibleTransactions =
   window.showAllTransactions
     ? allTransactions
     : allTransactions.slice(0, 5);
-
 $("#transaction-list").innerHTML =
   visibleTransactions
     .map(
@@ -552,7 +672,6 @@ $("#transaction-list").innerHTML =
 `
     )
     .join("");
-
 if (!allTransactions.length) {
 
   $("#transaction-list").innerHTML =
@@ -576,6 +695,122 @@ ${window.showAllTransactions ? "Show Less ▲" : "View More ▼"}
 
 }
 
+// =========================
+// AI Financial Snapshot
+// =========================
+
+$("#insight-balance").textContent =
+  money(left);
+
+$("#insight-category").textContent =
+  top
+    ? top[0]
+    : "-";
+
+const goalProgress =
+state.goal > 0
+? Math.max(
+    0,
+    Math.min(100, Math.round((Math.max(left,0)/state.goal)*100))
+)
+: 0;
+
+$("#insight-goal").textContent =
+  goalProgress + "%";
+
+  $("#insight-score").textContent =
+  `${healthScore} / 100`;
+
+  const scoreCard =
+$("#insight-score");
+
+if (healthScore >= 85) {
+
+  scoreCard.style.color = "#4CAF50";
+
+} else if (healthScore >= 70) {
+
+  scoreCard.style.color = "#8BC34A";
+
+} else if (healthScore >= 50) {
+
+  scoreCard.style.color = "#FFC107";
+
+} else {
+
+  scoreCard.style.color = "#F44336";
+
+}
+
+// =========================
+// Forecast Card
+// =========================
+
+$("#forecast-spend").textContent =
+  money(forecastSpend);
+
+$("#forecast-balance").textContent =
+  money(forecastBalance);
+
+  let forecastMessage = "";
+
+if (!state.income) {
+
+  forecastMessage =
+    "Add your monthly salary to enable forecasting.";
+
+}
+else if (forecastBalance < 0) {
+
+  forecastMessage =
+    "⚠ At your current pace, you may exceed your salary before month-end.";
+
+}
+else if (forecastBalance < state.goal) {
+
+  forecastMessage =
+    "💡 You're on track, but your savings goal may be difficult to achieve unless you reduce spending.";
+
+}
+else if (percent < 60) {
+
+  forecastMessage =
+    "🎉 Excellent! You're spending well within your plan and should comfortably reach your savings goal.";
+
+}
+else {
+
+  forecastMessage =
+    "👍 Your spending is under control. Continue at this pace to stay within budget.";
+
+}
+
+$("#forecast-message").textContent =
+  forecastMessage;
+const status =
+$("#forecast-status");
+
+if (forecastBalance < 0) {
+
+    status.textContent = "🔴 High Risk";
+    status.style.background = "#fde8e8";
+    status.style.color = "#c62828";
+
+}
+else if (forecastBalance < state.goal) {
+
+    status.textContent = "🟡 Watch Spending";
+    status.style.background = "#fff7d6";
+    status.style.color = "#996500";
+
+}
+else {
+
+    status.textContent = "🟢 On Track";
+    status.style.background = "#dff6e8";
+    status.style.color = "#14804a";
+
+}
 suggest(left, spent, top, byCategory);
 
 renderExpenseChart();
@@ -637,12 +872,7 @@ function suggest(left, spent, top, byCategory) {
     <p>${body}</p>
   `;
 
-  const askRow =
-    document.querySelector(".ask-row");
 
-  if (askRow) {
-    askRow.style.display = "none";
-  }
 }
 function categoryFor(text) {
   text = text.toLowerCase();
@@ -899,9 +1129,7 @@ setTimeout(() => {
 
   row.style.display = "flex";
 
-  row.insertAdjacentHTML(
-    "afterend",
-    `
+row.innerHTML = `
 <form id="ai-chat-form" class="splash-chat">
 
   <input
@@ -915,12 +1143,6 @@ setTimeout(() => {
 
 </form>
 
-<div
-  id="ai-chat-answer"
-  class="splash-answer"
-  aria-live="polite">
-</div>
-
 <small
   id="ai-chat-status"
   class="splash-status">
@@ -928,8 +1150,13 @@ setTimeout(() => {
   AI chat works after the app is deployed.
 
 </small>
-`
-  );
+
+<div
+  id="ai-chat-answer"
+  class="splash-answer"
+  aria-live="polite">
+</div>
+`;
 
   const css = document.createElement("style");
 
@@ -1181,11 +1408,11 @@ input.focus();
         "Request failed.";
     }
   };
-  document.addEventListener("change", (e) => {
+document.addEventListener("change", (e) => {
 
-  if (e.target.id === "graph-month-selector") {
+  if (e.target.id === "month-selector") {
 
-    renderExpenseChart();
+    render();
 
   }
 
@@ -1199,7 +1426,8 @@ document.addEventListener("click", (e) => {
     window.showAllTransactions =
       !window.showAllTransactions;
 
-    render();
+    renderExpenseChart();
+render();
 
   }
 

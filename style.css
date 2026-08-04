@@ -445,9 +445,21 @@ display:grid;
 
 grid-template-columns:1fr 1fr;
 
-gap:19px;
+gap:24px;
 
-margin-bottom:19px;
+margin-top:8px;
+
+align-items:start;
+
+}
+.lower-grid .panel{
+
+padding:28px;
+
+}
+.forecast-grid{
+
+margin-top:20px;
 
 }
 
@@ -1249,11 +1261,20 @@ transform:translateY(0);
 }
 
 .splash-chat button{
-    transition:.25s;
+    width:78px;
+    height:42px;
+    border:none;
+    border-radius:10px;
+    background:#f6c85f;
+    color:#10332d;
+     font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.2s;
 }
 
 .splash-chat button:hover{
-    transform:scale(1.05);
+    transform:translateY(-1px);
 }
 
 .splash-chat button:disabled{
@@ -1270,6 +1291,46 @@ transition:all .35s ease;
 opacity:1;
 transform:translateY(0);
 display:block;
+}
+
+.splash-chat{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-top:14px;
+}
+
+.splash-chat input{
+    flex:1;
+    height:42px;
+    padding:0 14px;
+    border-radius:10px;
+    border:2px solid rgba(255,255,255,.15);
+    font-size:15px;
+    outline:none;
+}
+
+.splash-status{
+    display:block;
+    margin-top:10px;
+    color:#b7d7d0;
+    font-size:13px;
+}
+
+.splash-answer{
+    margin-top:16px;
+    opacity:0;
+    transform:translateY(10px);
+    transition:all .35s ease;
+}
+
+.splash-answer.show{
+    opacity:1;
+    transform:translateY(0);
+    display:block;
+}
+.ask-row{
+    display:block !important;
 }
 
 /* ===========================
@@ -1346,7 +1407,7 @@ border-radius:14px;
 }
 
 }
-#graph-month-selector{
+#month-selector{
 width:220px;
 height:48px;
 padding:0 16px;
@@ -1360,12 +1421,12 @@ margin-left:auto;
 transition:all .3s ease;
 }
 
-#graph-month-selector:hover{
+#month-selector:hover{
 transform:translateY(-2px);
 box-shadow:0 10px 20px rgba(10,98,84,.12);
 }
 
-#graph-month-selector:focus{
+#month-selector:focus{
 outline:none;
 border-color:var(--green);
 box-shadow:0 0 0 4px rgba(10,98,84,.15);
@@ -1428,4 +1489,246 @@ transform:translateY(-2px);
 
 box-shadow:0 10px 20px rgba(10,98,84,.15);
 
+}
+
+/* ===========================
+   AI Financial Snapshot
+=========================== */
+
+.ai-insights{
+
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:14px;
+    margin:18px 0 22px;
+
+}
+
+.insight-card{
+
+    background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.08);
+    border-radius:16px;
+
+    padding:16px;
+
+    min-height:100px;
+
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+
+    backdrop-filter:blur(10px);
+
+    transition:all .25s ease;
+
+}
+
+.insight-card:hover{
+
+    transform:translateY(-3px);
+
+    background:rgba(255,255,255,.09);
+
+    border-color:rgba(255,255,255,.15);
+
+}
+
+.insight-card span{
+
+    display:block;
+
+    font-size:13px;
+
+    font-weight:500;
+
+    color:#b8d8d1;
+
+    margin-bottom:10px;
+
+}
+
+.insight-card strong{
+
+    display:block;
+
+    font-size:24px;
+
+    font-weight:700;
+
+    line-height:1.2;
+
+    color:#ffffff;
+
+}
+
+/* ---------- Tablet ---------- */
+
+@media (max-width:900px){
+
+.ai-insights{
+
+    gap:12px;
+
+}
+
+.insight-card{
+
+    padding:15px;
+
+    min-height:95px;
+
+}
+
+.insight-card strong{
+
+    font-size:22px;
+
+}
+
+}
+
+/* ---------- Mobile ---------- */
+
+@media (max-width:700px){
+
+.ai-insights{
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:10px;
+
+}
+
+.insight-card{
+
+    padding:14px;
+
+    min-height:88px;
+
+}
+
+.insight-card span{
+
+    font-size:12px;
+
+    margin-bottom:8px;
+
+}
+
+.insight-card strong{
+
+    font-size:20px;
+
+}
+
+}
+
+/* ---------- Small Phones ---------- */
+
+@media (max-width:420px){
+
+.ai-insights{
+
+    gap:8px;
+
+}
+
+.insight-card{
+
+    padding:12px;
+
+    min-height:82px;
+
+}
+
+.insight-card span{
+
+    font-size:11px;
+
+}
+
+.insight-card strong{
+
+    font-size:18px;
+
+}
+
+}
+/* ===========================
+   Spending Forecast
+=========================== */
+
+.forecast-panel{
+    margin-top:24px;
+    margin-bottom:32px;
+}
+
+.forecast-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:16px;
+    margin-top:18px;
+}
+
+.forecast-card{
+    background:#f7faf9;
+    border:1px solid #dfe9e5;
+    border-radius:18px;
+    padding:20px;
+    transition:.25s ease;
+}
+
+.forecast-card:hover{
+    transform:translateY(-2px);
+    box-shadow:0 8px 20px rgba(0,0,0,.06);
+}
+
+.forecast-card small{
+    display:block;
+    color:#6b7d79;
+    font-size:14px;
+    margin-bottom:10px;
+    font-weight:600;
+}
+
+.forecast-card strong{
+    display:block;
+    font-size:32px;
+    color:#10322d;
+    font-weight:700;
+}
+
+.forecast-card p{
+    margin:10px 0 0;
+    color:#1f3d38;
+    line-height:1.7;
+    font-size:16px;
+    font-weight:500;
+}
+
+.forecast-card.wide{
+    grid-column:1 / -1;
+}
+
+@media (max-width:768px){
+
+    .forecast-grid{
+        grid-template-columns:1fr;
+    }
+
+    .forecast-card.wide{
+        grid-column:auto;
+    }
+
+}
+.forecast-status{
+    display:inline-block;
+    margin-top:12px;
+    padding:6px 12px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:700;
+    background:#dff6e8;
+    color:#14804a;
 }

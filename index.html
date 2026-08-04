@@ -245,7 +245,6 @@ What should I do next?
 </span>
 
 </div>
-
 <p
 id="ai-summary"
 class="ai-summary">
@@ -254,6 +253,30 @@ I will turn your balance into a simple action plan.
 
 </p>
 
+<div class="ai-insights" id="ai-insights">
+
+    <div class="insight-card">
+        <span>💰 Remaining</span>
+        <strong id="insight-balance">₹0</strong>
+    </div>
+
+    <div class="insight-card">
+        <span>❤️ Health Score</span>
+        <strong id="insight-score">0 / 100</strong>
+    </div>
+
+    <div class="insight-card">
+        <span>📊 Top Category</span>
+        <strong id="insight-category">-</strong>
+    </div>
+
+    <div class="insight-card">
+        <span>🎯 Goal Progress</span>
+        <strong id="insight-goal">0%</strong>
+    </div>
+
+</div>
+
 <div
 class="ai-answer"
 id="ai-result">
@@ -261,25 +284,6 @@ id="ai-result">
 </div>
 
 <div class="ask-row">
-
-<button data-prompt="save">
-
-Save more
-
-</button>
-
-<button data-prompt="invest">
-
-Can I invest?
-
-</button>
-
-<button data-prompt="risk">
-
-Check risk
-
-</button>
-
 </div>
 
 </article>
@@ -361,9 +365,7 @@ class="category-list">
 
         </div>
 
-        <select id="graph-month-selector">
-
-</select>
+       <select id="month-selector"></select>
 
     </div>
 
@@ -373,8 +375,61 @@ class="category-list">
     </canvas>
 
 </section>
-<section class="lower-grid">
 
+<section class="panel forecast-panel">
+
+    <div class="panel-head">
+
+        <div>
+
+            <p class="kicker">
+                MONEY INTELLIGENCE
+            </p>
+
+            <h2>
+                Spending Forecast
+            </h2>
+
+        </div>
+
+    </div>
+
+ <div class="forecast-grid">
+
+    <div class="forecast-card">
+
+        <small>📈 Expected Spend</small>
+
+        <strong id="forecast-spend">₹0</strong>
+        <div id="forecast-status" class="forecast-status">
+    On Track
+</div>
+
+    </div>
+
+    <div class="forecast-card">
+
+        <small>💰 Expected Balance</small>
+
+        <strong id="forecast-balance">₹0</strong>
+
+    </div>
+
+    <div class="forecast-card wide">
+
+        <small>🤖  Prediction</small>
+
+        <p id="forecast-message">
+            Add a few expenses to generate a forecast.
+        </p>
+
+    </div>
+
+</div>
+
+</section>
+
+<section class="lower-grid">
 <article class="panel">
 
 <div class="panel-head">
