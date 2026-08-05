@@ -191,7 +191,7 @@ Return plain text only.
 
     return res.status(200).json({
       answer:
-        "🤖 AI chat is taking a short break. Please try again later."
+        "⚠️ AI is temporarily unavailable. Please try again in a few minutes."
     });
 
   }
