@@ -190,8 +190,8 @@ Return plain text only.
   if (orResponse.status === 429) {
 
     return res.status(200).json({
-      // answer:
-      //   "🤖 AI chat is taking a short break. Please try again later."
+      answer:
+        "🤖 AI chat is taking a short break. Please try again later."
     });
 
   }
