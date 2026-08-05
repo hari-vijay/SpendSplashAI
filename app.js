@@ -1094,11 +1094,12 @@ $("#ai-result").innerHTML = `
 
 <span>🤖 AI RECOMMENDATION</span>
 
-<strong>${title}</strong>
+<strong>AI Insights Unavailable</strong>
 
-<p>${body}</p>
-
-
+<p>
+AI recommendations are temporarily unavailable.
+Your dashboard continues to track expenses normally.
+</p>
 
 </div>
 `;
