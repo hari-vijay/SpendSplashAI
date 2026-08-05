@@ -1326,17 +1326,7 @@ async function loadAIRecommendation() {
 
 <span>🤖 AI RECOMMENDATION</span>
 
-<strong>Personal Finance Coach</strong>
-
-<p>${data.answer}</p>
-
-<div class="ai-tip">
-
-💡 <b>Quick Tip:</b>
-
-Ask AI anything about your money.
-
-</div>
+<p>${data.answer.replace(/\n/g, "<br>")}</p>
 
 </div>
 
