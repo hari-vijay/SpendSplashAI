@@ -1332,22 +1332,13 @@ Rules:
     const data = await response.json();
 
     if (!response.ok || !data.answer) return;
-
-    $("#ai-result").innerHTML = `
+$("#ai-result").innerHTML = `
 
 <div class="ai-recommendation">
 
 <span>🤖 AI RECOMMENDATION</span>
 
 <p>${data.answer.replace(/\n/g, "<br>")}</p>
-
-<div class="ai-tip">
-
-💡 <b>Quick Tip:</b>
-
-Ask AI anything about your money.
-
-</div>
 
 </div>
 
