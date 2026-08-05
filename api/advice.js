@@ -5,11 +5,12 @@ module.exports = async function handler(req, res) {
     });
   }
 
-  const apiKey = process.env.GEMINI_API_KEY;
+  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+  const OPENROUTER_API_KEY = process.env.OPENROUTER_API_KEY;
 
-  if (!apiKey) {
+  if (!GEMINI_API_KEY && !OPENROUTER_API_KEY) {
     return res.status(500).json({
-      error: "Missing GEMINI_API_KEY"
+      error: "No AI provider configured."
     });
   }
 
@@ -58,64 +59,144 @@ RULES
 - Use only values from the report.
 - Always answer in complete sentences.
 - Never return incomplete text.
-- Keep the answer under 80 words.
-- Sound friendly and professional.
+- Keep answers below 80 words.
+- Friendly and professional.
 - Give practical advice.
 - Mention money values whenever useful.
-- If spending is healthy, appreciate briefly.
-- If spending is risky, explain why.
-- End with one actionable recommendation.
-
-Example style:
-
-"Your forecast spending is ₹11,100. At this pace you are likely to exhaust your monthly budget before month-end. Reducing discretionary expenses in your highest spending category will improve your remaining balance."
+- Appreciate good spending habits.
+- Explain risks if spending is unhealthy.
+- Finish with one actionable recommendation.
 
 Return plain text only.
 `;
 
-    const response = await fetch(
-`https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${apiKey}`,
+    // ==========================================================
+    // 1. TRY GEMINI FIRST
+    // ==========================================================
+
+    if (GEMINI_API_KEY) {
+
+      try {
+
+        const geminiResponse = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+              contents: [
+                {
+                  parts: [
+                    {
+                      text: prompt
+                    }
+                  ]
+                }
+              ],
+              generationConfig: {
+                temperature: 0.4,
+                maxOutputTokens: 300
+              }
+            })
+          }
+        );
+
+        const geminiData = await geminiResponse.json();
+
+        if (geminiResponse.ok) {
+
+          let answer =
+            geminiData?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+          answer = answer
+            .replace(/\*\*/g, "")
+            .replace(/\*/g, "")
+            .replace(/\n{3,}/g, "\n\n")
+            .trim();
+
+          if (answer) {
+
+            console.log("✅ Gemini Success");
+
+            return res.status(200).json({
+              answer
+            });
+
+          }
+
+        }
+
+        console.log("⚠ Gemini Failed -> Switching to OpenRouter");
+
+      } catch (e) {
+
+        console.log("⚠ Gemini Exception -> OpenRouter");
+
+      }
+
+    }
+
+    // ==========================================================
+    // 2. FALLBACK TO OPENROUTER
+    // ==========================================================
+
+    if (!OPENROUTER_API_KEY) {
+
+      return res.status(500).json({
+        error: "Both Gemini and OpenRouter unavailable."
+      });
+
+    }
+
+    const orResponse = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
       {
         method: "POST",
         headers: {
-          "Content-Type": "application/json"
+          Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": "https://spend-splash-ai.vercel.app",
+          "X-Title": "Spend Splash AI"
         },
         body: JSON.stringify({
-          contents: [
+
+          model: "inclusionai/ling-3.0-flash:free",
+
+          messages: [
             {
-              parts: [
-                {
-                  text: prompt
-                }
-              ]
+              role: "user",
+              content: prompt
             }
           ],
-          generationConfig: {
-            temperature: 0.4,
-            maxOutputTokens: 500
+
+          temperature: 0.4,
+
+          max_tokens: 300,
+
+          provider: {
+            allow_fallbacks: true
           }
+
         })
       }
     );
 
-    const data = await response.json();
+    const orData = await orResponse.json();
 
-    console.log(
-      JSON.stringify(data, null, 2)
-    );
+    if (!orResponse.ok) {
 
-    if (!response.ok) {
-
-      return res.status(response.status).json({
+      return res.status(orResponse.status).json({
         error:
-          data?.error?.message ||
-          "Gemini request failed."
+          orData?.error?.message ||
+          "OpenRouter request failed."
       });
 
     }
 
     let answer =
-      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+      orData?.choices?.[0]?.message?.content ||
       "";
 
     answer = answer
@@ -127,15 +208,19 @@ Return plain text only.
     if (!answer) {
 
       answer =
-        "I couldn't generate financial advice right now. Please try again.";
+        "I couldn't generate financial advice right now.";
 
     }
+
+    console.log("✅ OpenRouter Success");
 
     return res.status(200).json({
       answer
     });
 
-  } catch (err) {
+  }
+
+  catch (err) {
 
     console.error(err);
 
@@ -144,4 +229,5 @@ Return plain text only.
     });
 
   }
+
 };
