@@ -1307,8 +1307,21 @@ async function loadAIRecommendation() {
 
       body: JSON.stringify({
 
-        question:
-          "Give one short personalized financial recommendation for my dashboard. Return only the recommendation.",
+        question: `
+You are Spend Splash AI.
+
+Based on the user's financial summary, provide:
+
+- One personalized recommendation (maximum 45 words).
+- End with one sentence starting with "💡 Tip:".
+
+Rules:
+- No greeting.
+- No title or heading.
+- Keep it short and practical.
+- Mention specific categories or spending patterns only if relevant.
+- Return plain text only.
+`,
 
         context,
 
