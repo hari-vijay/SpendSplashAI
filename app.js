@@ -1307,8 +1307,21 @@ async function loadAIRecommendation() {
 
       body: JSON.stringify({
 
-        question:
-          "Give one short personalized financial recommendation for my dashboard. Return only the recommendation.",
+        question: `
+You are Spend Splash AI.
+
+Based only on the financial report provided:
+
+- Write one personalized financial recommendation (maximum 50 words).
+- End with one short tip starting with "💡 Tip:".
+
+Rules:
+- Do not greet the user.
+- Do not add a title or heading.
+- Use simple English.
+- Use ₹ for money when mentioning amounts.
+- Return only the recommendation and tip.
+`,
 
         context,
 
@@ -1326,9 +1339,7 @@ async function loadAIRecommendation() {
 
 <span>🤖 AI RECOMMENDATION</span>
 
-<strong>Personal Finance Coach</strong>
-
-<p>${data.answer}</p>
+<p>${data.answer.replace(/\n/g, "<br>")}</p>
 
 <div class="ai-tip">
 
