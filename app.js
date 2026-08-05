@@ -466,7 +466,7 @@ healthScore = Math.max(
         state.income
       )} salary${
         state.goal
-          ? `, with ${money(state.goal)} saved for my goal`
+          ? `, with ${`Rs. ${state.goal.toLocaleString("en-IN")}`} saved for my goal`
           : ""
       }.`
     : "Add monthly salary to start tracking.";
@@ -485,7 +485,7 @@ healthScore = Math.max(
     `${money(spent)} spent (${percent}%)`;
 
   $("#salary-label").textContent =
-    `${money(state.income)} salary`;
+    `${`Rs. ${state.income.toLocaleString("en-IN")}`} salary`;
 
   if (percent >= 100) {
     $("#health-pill").textContent = "Budget Exceeded";
@@ -596,13 +596,13 @@ $("#month-label").textContent =
       .join("");
 
   $("#plan-income").textContent =
-    money(state.income);
+    `Rs. ${state.income.toLocaleString("en-IN")}`;
 
   $("#plan-spend").textContent =
     "-" + money(spent);
 
   $("#plan-goal").textContent =
-    "-" + money(state.goal);
+    "-" + `Rs. ${state.goal.toLocaleString("en-IN")}`;
 
  if (left >= 0) {
 
@@ -858,7 +858,7 @@ function suggest(left, spent, top, byCategory) {
     body =
       "Add your salary once. Every expense will then update your remaining balance.";
   } else if (over) {
-    title = `${over[0]} is over budget`;
+    title = "Smart Spending Advice";
 
     body = `You spent ${money(
       over[1]
@@ -894,15 +894,7 @@ $("#ai-result").innerHTML = `
 
 <p>${body}</p>
 
-<div class="ai-tip">
 
-💡 <b>Quick Tip:</b>
-Ask AI questions like:
-"Can I buy a ₹3000 headphone?"
-or
-"How can I save more this month?"
-
-</div>
 
 </div>
 `;
@@ -1040,135 +1032,369 @@ toast.remove();
 
 }
 
-async function downloadReport() {
 
-  const { jsPDF } = window.jspdf;
+ function updateReportTemplate() {
 
-  const pdf = new jsPDF();
+    const report = document.getElementById("report-template");
+    if (!report) return;
 
-  let y = 20;
+    // =========================
+    // HEADER
+    // =========================
 
-  pdf.setFontSize(20);
-  pdf.text("Spend Splash Report", 20, y);
+    const meta = report.querySelector(".meta");
 
-  y += 15;
+    if (meta) {
+        meta.innerHTML = `
+            <strong>Generated:</strong><br>
+            ${new Date().toLocaleDateString("en-IN")}
+            <br><br>
+            <strong>Month:</strong><br>
+            ${$("#month-label").textContent}
+        `;
+    }
 
-  pdf.setFontSize(12);
+    // =========================
+    // OVERVIEW CARDS
+    // =========================
 
-  pdf.text(
-    `Month: ${$("#month-label").textContent}`,
-    20,
-    y
-  );
+    const cards = report.querySelectorAll(".card-value");
 
-  y += 10;
+    if (cards.length >= 4) {
+        cards[0].textContent = money(state.income);
+        cards[1].textContent = money(total());
+        cards[2].textContent = money(balance());
+        cards[3].textContent = $("#insight-score").textContent;
+    }
 
-  pdf.text(
-    `Monthly Salary: ${money(state.income)}`,
-    20,
-    y
-  );
+    // =========================
+    // CATEGORY TABLE
+    // =========================
 
-  y += 10;
+    const categoryBody =
+        document.getElementById("report-categories");
 
-  pdf.text(
-    `Savings Goal: ${money(state.goal)}`,
-    20,
-    y
-  );
+    if (categoryBody) {
 
-  y += 10;
+        categoryBody.innerHTML = "";
 
-  pdf.text(
-    `Expenses: ${$("#plan-spend").textContent}`,
-    20,
-    y
-  );
+        const categoryTotals = totals();
 
-  y += 10;
+        Object.keys(state.budgets).forEach(category => {
 
-  pdf.text(
-    `Remaining Balance: ${$("#balance-main").textContent}`,
-    20,
-    y
-  );
+            const spent =
+                categoryTotals[category] || 0;
 
-  y += 10;
+            const budget =
+                state.budgets[category] || 0;
 
-  pdf.text(
-    `Health Score: ${$("#insight-score").textContent}`,
-    20,
-    y
-  );
+            const percent =
+                budget
+                ? Math.min((spent / budget) * 100, 100)
+                : 0;
 
-  y += 15;
+            categoryBody.innerHTML += `
+                <tr>
 
-  pdf.setFontSize(15);
+                    <td>${category}</td>
 
-  pdf.text(
-    "Recent Transactions",
-    20,
-    y
-  );
+                    <td>${money(budget)}</td>
 
-  y += 10;
+                    <td>${money(spent)}</td>
 
-  const selector = $("#month-selector");
+                    <td>
 
-  const [year, month] =
-    selector.value.split("-").map(Number);
+                        <div class="progress">
 
-  const transactions =
-    state.expenses.filter(expense => {
+                            <div
+                                class="progress-fill"
+                                style="width:${percent}%">
+                            </div>
 
-      const d = new Date(expense.date);
+                        </div>
 
-      return (
-        d.getFullYear() === year &&
-        d.getMonth() === month
-      );
+                    </td>
 
-    });
+                </tr>
+            `;
 
-  pdf.setFontSize(11);
+        });
 
-  if (!transactions.length) {
+    }
 
-    pdf.text(
-      "No transactions found.",
-      20,
-      y
+    // =========================
+    // TRANSACTIONS
+    // =========================
+
+     const selector = $("#month-selector");
+
+        const [year, month] =
+            selector.value.split("-").map(Number);
+
+        const transactions =
+            state.expenses.filter(expense => {
+
+                const d = new Date(expense.date);
+
+                return (
+                    d.getFullYear() === year &&
+                    d.getMonth() === month
+                );
+
+            });
+
+    const transactionBody =
+        document.getElementById("report-transactions");
+
+    if (transactionBody) {
+
+        transactionBody.innerHTML = "";
+
+       
+
+        if (!transactions.length) {
+
+            transactionBody.innerHTML = `
+                <tr>
+
+                    <td colspan="4"
+                        style="text-align:center;padding:20px;">
+
+                        No transactions found.
+
+                    </td>
+
+                </tr>
+            `;
+
+        } else {
+          console.table(transactions);
+
+            const latestTransactions =
+    [...transactions]
+        .reverse()
+        .slice(0, 5);
+
+latestTransactions.forEach(expense => {
+
+    const formattedDate = new Date(expense.date)
+        .toLocaleDateString("en-IN", {
+            day: "numeric",
+            month: "short"
+        });
+
+    transactionBody.innerHTML += `
+        <tr>
+            <td>${formattedDate}</td>
+            <td>${expense.name}</td>
+            <td>${expense.category}</td>
+            <td>${money(expense.amount)}</td>
+        </tr>
+    `;
+
+});
+
+        }
+
+    }
+
+
+
+    // =========================
+// FINANCIAL STATISTICS
+// =========================
+
+const totalTransactions =
+    transactions.length;
+
+const amounts =
+    transactions.map(t => t.amount);
+
+const averageExpense =
+    amounts.length
+        ? Math.round(
+            amounts.reduce((a, b) => a + b, 0) /
+            amounts.length
+        )
+        : 0;
+
+const highestExpense =
+    amounts.length
+        ? Math.max(...amounts)
+        : 0;
+
+const lowestExpense =
+    amounts.length
+        ? Math.min(...amounts)
+        : 0;
+
+document.getElementById("stats-total-transactions").textContent =
+    totalTransactions;
+
+document.getElementById("stats-average-expense").textContent =
+    money(averageExpense);
+
+document.getElementById("stats-highest-expense").textContent =
+    money(highestExpense);
+
+document.getElementById("stats-lowest-expense").textContent =
+    money(lowestExpense);
+
+
+    
+
+    // =========================
+    // AI SECTION
+    // =========================
+
+    const reportAI =
+        document.getElementById("report-ai");
+
+    if (reportAI) {
+
+        reportAI.innerHTML =
+            $("#ai-result").innerHTML;
+
+    }
+
+   // =========================
+// MONTHLY SUMMARY
+// =========================
+
+const goal =
+    document.getElementById("report-goal");
+
+if (goal) {
+
+    goal.textContent =
+        money(state.goal);
+
+}
+
+const budgetUsed =
+    document.getElementById("report-budget-used");
+
+let spentPercent = 0;
+
+if (budgetUsed) {
+
+    spentPercent =
+        state.income
+        ? Math.round((total() / state.income) * 100)
+        : 0;
+
+    budgetUsed.textContent =
+        spentPercent + "%";
+
+}
+
+const categoryTotals =
+    totals();
+
+let highestCategory = "-";
+let max = 0;
+
+Object.entries(categoryTotals).forEach(([cat, val]) => {
+
+    if (val > max) {
+
+        max = val;
+        highestCategory = cat;
+
+    }
+
+});
+
+const topCategory =
+    document.getElementById("report-top-category");
+
+if (topCategory) {
+
+    topCategory.textContent =
+        highestCategory;
+
+}
+
+// =========================
+// REPORT SUMMARY
+// =========================
+
+const summary =
+    document.getElementById("report-summary-text");
+
+if (summary) {
+
+    summary.innerHTML = `
+You spent <b>${spentPercent}%</b> of your monthly income this month.
+Your highest spending category was <b>${highestCategory}</b>.
+Your financial health score is <b>${$("#insight-score").textContent}</b>.
+You still have <b>${money(balance())}</b> available to spend or save.
+`;
+
+}
+
+}
+
+function downloadReport() {
+
+    updateReportTemplate();
+
+    const report =
+        document.getElementById("report-template");
+
+   html2canvas(report, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: "#ffffff"
+}).then(canvas => {
+
+    const imgData = canvas.toDataURL("image/png");
+
+    const { jsPDF } = window.jspdf;
+
+    const pdf = new jsPDF("p", "mm", "a4");
+
+    const pageWidth = 210;
+    const pageHeight = 297;
+
+    const imgWidth = pageWidth;
+    const imgHeight = canvas.height * imgWidth / canvas.width;
+
+    let heightLeft = imgHeight;
+    let position = 0;
+
+    pdf.addImage(
+        imgData,
+        "PNG",
+        0,
+        position,
+        imgWidth,
+        imgHeight
     );
 
-  } else {
+    heightLeft -= pageHeight;
 
-    transactions.forEach(expense => {
+    while (heightLeft > 0) {
 
-      pdf.text(
-
-`${expense.date} | ${expense.name} | ${expense.category} | ${money(expense.amount)}`,
-
-20,
-
-y
-
-);
-
-      y += 8;
-
-      if (y > 280) {
+        position = heightLeft - imgHeight;
 
         pdf.addPage();
 
-        y = 20;
+        pdf.addImage(
+            imgData,
+            "PNG",
+            0,
+            position,
+            imgWidth,
+            imgHeight
+        );
 
-      }
+        heightLeft -= pageHeight;
+    }
 
-    });
+    pdf.save("SpendSplash_Report.pdf");
 
-  }
-
-  pdf.save("SpendSplash_Report.pdf");
+});
 
 }
 
@@ -1231,10 +1457,10 @@ ${new Date().toLocaleString("en-IN", {
 })}
 
 Monthly Salary:
-${money(state.income)}
+${`Rs. ${state.income.toLocaleString("en-IN")}`}
 
 Savings Goal:
-${money(state.goal)}
+${`Rs. ${state.goal.toLocaleString("en-IN")}`}
 
 Remaining Balance:
 ${money(left)}

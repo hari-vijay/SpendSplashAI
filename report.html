@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Spend Splash AI - Monthly Financial Report</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+}
+
+:root{
+
+    --primary:#136d5b;
+    --primary-light:#edf8f5;
+    --border:#e8ecef;
+    --text:#1f2937;
+    --muted:#6b7280;
+    --bg:#ffffff;
+    --shadow:0 8px 24px rgba(0,0,0,.06);
+    --radius:18px;
+
+}
+
+body{
+
+    background:#f4f6f8;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--text);
+    padding:30px;
+
+}
+
+.report{
+
+    width:794px;
+    min-height:1123px;
+    margin:auto;
+    background:#fff;
+    border-radius:24px;
+    padding:42px;
+    box-shadow:0 10px 35px rgba(0,0,0,.08);
+
+}
+
+/* ---------------- HEADER ---------------- */
+
+.header{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-bottom:40px;
+    border-bottom:1px solid var(--border);
+    padding-bottom:24px;
+
+}
+
+.logo{
+
+    width:70px;
+    height:70px;
+    border:2px dashed #cfd8dc;
+    border-radius:16px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    color:#9ca3af;
+    font-weight:600;
+
+}
+
+.title{
+
+    flex:1;
+    margin-left:20px;
+
+}
+
+.title h1{
+
+    font-size:34px;
+    font-weight:700;
+    color:var(--text);
+    margin-bottom:8px;
+
+}
+
+.meta{
+
+    text-align:right;
+    color:var(--muted);
+    font-size:14px;
+    line-height:1.7;
+
+}
+
+/* ---------------- SECTION ---------------- */
+
+.section{
+
+    margin-top:34px;
+
+}
+
+.section-title{
+
+    font-size:18px;
+    font-weight:700;
+    margin-bottom:18px;
+    color:var(--primary);
+
+}
+
+/* ---------------- OVERVIEW ---------------- */
+
+.overview-grid{
+
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:18px;
+
+}
+
+.card{
+
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    box-shadow:var(--shadow);
+    padding:22px;
+
+}
+
+.card-header{
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:16px;
+
+}
+
+.icon{
+
+    width:44px;
+    height:44px;
+    border-radius:12px;
+    background:var(--primary-light);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+
+}
+
+.card h3{
+
+    font-size:15px;
+    color:var(--muted);
+    font-weight:600;
+
+}
+
+.card-value{
+
+    font-size:28px;
+    font-weight:700;
+    color:var(--text);
+
+}
+
+/* ---------------- TABLE ---------------- */
+
+table{
+
+    width:100%;
+    border-collapse:collapse;
+
+}
+
+th{
+
+    text-align:left;
+    font-size:14px;
+    padding:14px;
+    background:#f8fafb;
+    color:var(--muted);
+    border-bottom:1px solid var(--border);
+
+}
+
+td{
+
+    padding:14px;
+    border-bottom:1px solid var(--border);
+    font-size:14px;
+
+}
+
+tbody tr:nth-child(even){
+
+    background:#fafafa;
+
+}
+
+.progress{
+
+    width:100%;
+    height:8px;
+    background:#edf1f2;
+    border-radius:50px;
+    overflow:hidden;
+
+}
+
+.progress-fill{
+
+    width:55%;
+    height:100%;
+    background:var(--primary);
+
+}
+
+/* ---------------- AI ---------------- */
+
+.ai-box{
+
+    background:var(--primary-light);
+    border-left:6px solid var(--primary);
+    border-radius:20px;
+    padding:24px;
+
+}
+
+.ai-box h3{
+
+    color:var(--primary);
+    font-size:20px;
+    margin-bottom:16px;
+
+}
+
+.ai-text{
+
+    line-height:1.8;
+    color:#374151;
+    margin-bottom:20px;
+
+}
+
+.tip{
+
+    padding:16px;
+    border-radius:14px;
+    background:#fff;
+    border:1px solid var(--border);
+
+}
+
+/* ---------------- KPI ---------------- */
+
+.kpi-grid{
+
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:18px;
+
+}
+
+.kpi{
+
+    background:#fff;
+    border:1px solid var(--border);
+    border-radius:18px;
+    padding:22px;
+    box-shadow:var(--shadow);
+
+}
+
+.kpi-title{
+
+    color:var(--muted);
+    margin-bottom:14px;
+    font-size:15px;
+
+}
+
+.kpi-value{
+
+    font-size:24px;
+    font-weight:700;
+
+}
+
+/* ---------------- FOOTER ---------------- */
+
+.footer{
+
+    margin-top:45px;
+    border-top:1px solid var(--border);
+    padding-top:18px;
+    text-align:center;
+    color:var(--muted);
+    font-size:13px;
+    line-height:1.8;
+
+}
+
+.placeholder{
+
+    color:#9ca3af;
+
+}
+</style>
+</head>
+
+<body>
+
+<div class="report" id="report-template">
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <div class="logo">
+            Logo
+        </div>
+
+        <div class="title">
+
+            <h1>Monthly Financial Report</h1>
+
+            <div class="placeholder">
+                Spend Splash AI
+            </div>
+
+        </div>
+
+        <div class="meta">
+
+            <strong>Generated:</strong><br>
+            {{reportDate}}
+
+            <br><br>
+
+            <strong>Month:</strong><br>
+            {{month}}
+
+        </div>
+
+    </div>
+
+    <!-- OVERVIEW -->
+
+    <div class="section">
+
+        <div class="section-title">
+            Financial Overview
+        </div>
+
+        <div class="overview-grid">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h3>Monthly Salary</h3>
+                    <div class="icon">💰</div>
+                </div>
+
+                <div class="card-value">
+                    ₹{{salary}}
+                </div>
+
+            </div>
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h3>Total Spent</h3>
+                    <div class="icon">💸</div>
+                </div>
+
+                <div class="card-value">
+                    ₹{{spent}}
+                </div>
+
+            </div>
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h3>Remaining Balance</h3>
+                    <div class="icon">💵</div>
+                </div>
+
+                <div class="card-value">
+                    ₹{{balance}}
+                </div>
+
+            </div>
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h3>Financial Health</h3>
+                    <div class="icon">❤️</div>
+                </div>
+
+                <div class="card-value">
+                    {{healthScore}} / 100
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- CATEGORY -->
+
+    <div class="section">
+
+        <div class="section-title">
+            Category Breakdown
+        </div>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Category</th>
+                    <th>Budget</th>
+                    <th>Spent</th>
+                    <th>Status</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                <tr>
+                    <td>Food</td>
+                    <td>{{budget}}</td>
+                    <td>{{spent}}</td>
+                    <td>
+                        <div class="progress">
+                            <div class="progress-fill"></div>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Bills</td>
+                    <td>{{budget}}</td>
+                    <td>{{spent}}</td>
+                    <td>
+                        <div class="progress">
+                            <div class="progress-fill"></div>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Shopping</td>
+                    <td>{{budget}}</td>
+                    <td>{{spent}}</td>
+                    <td>
+                        <div class="progress">
+                            <div class="progress-fill"></div>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Transport</td>
+                    <td>{{budget}}</td>
+                    <td>{{spent}}</td>
+                    <td>
+                        <div class="progress">
+                            <div class="progress-fill"></div>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Health</td>
+                    <td>{{budget}}</td>
+                    <td>{{spent}}</td>
+                    <td>
+                        <div class="progress">
+                            <div class="progress-fill"></div>
+                        </div>
+                    </td>
+                </tr>
+
+                <tr>
+                    <td>Other</td>
+                    <td>{{budget}}</td>
+                    <td>{{spent}}</td>
+                    <td>
+                        <div class="progress">
+                            <div class="progress-fill"></div>
+                        </div>
+                    </td>
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- AI -->
+
+    <div class="section">
+
+        <div class="section-title">
+            AI Insights
+        </div>
+
+        <div class="ai-box">
+
+            <h3>
+                🤖 AI Recommendation
+            </h3>
+
+            <div class="ai-text">
+                {{aiRecommendation}}
+            </div>
+
+            <div class="tip">
+
+                <strong>💡 Tip</strong>
+
+                <br><br>
+
+                {{aiTip}}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- TRANSACTIONS -->
+
+    <div class="section">
+
+        <div class="section-title">
+            Recent Transactions
+        </div>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Date</th>
+                    <th>Expense</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                <tr><td>{{date}}</td><td>{{expense}}</td><td>{{category}}</td><td>₹{{amount}}</td></tr>
+                <tr><td>{{date}}</td><td>{{expense}}</td><td>{{category}}</td><td>₹{{amount}}</td></tr>
+                <tr><td>{{date}}</td><td>{{expense}}</td><td>{{category}}</td><td>₹{{amount}}</td></tr>
+                <tr><td>{{date}}</td><td>{{expense}}</td><td>{{category}}</td><td>₹{{amount}}</td></tr>
+                <tr><td>{{date}}</td><td>{{expense}}</td><td>{{category}}</td><td>₹{{amount}}</td></tr>
+                <tr><td>{{date}}</td><td>{{expense}}</td><td>{{category}}</td><td>₹{{amount}}</td></tr>
+                <tr><td>{{date}}</td><td>{{expense}}</td><td>{{category}}</td><td>₹{{amount}}</td></tr>
+                <tr><td>{{date}}</td><td>{{expense}}</td><td>{{category}}</td><td>₹{{amount}}</td></tr>
+                <tr><td>{{date}}</td><td>{{expense}}</td><td>{{category}}</td><td>₹{{amount}}</td></tr>
+                <tr><td>{{date}}</td><td>{{expense}}</td><td>{{category}}</td><td>₹{{amount}}</td></tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    <!-- KPI -->
+
+    <div class="section">
+
+        <div class="section-title">
+            Monthly Summary
+        </div>
+
+        <div class="kpi-grid">
+
+            <div class="kpi">
+
+                <div class="kpi-title">
+                    Savings Progress
+                </div>
+
+                <div class="kpi-value">
+                    {{goal}}
+                </div>
+
+            </div>
+
+            <div class="kpi">
+
+                <div class="kpi-title">
+                    Budget Used
+                </div>
+
+                <div class="kpi-value">
+                    {{budgetUsed}}
+                </div>
+
+            </div>
+
+            <div class="kpi">
+
+                <div class="kpi-title">
+                    Top Spending Category
+                </div>
+
+                <div class="kpi-value">
+                    {{topCategory}}
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+
+    <div class="footer">
+
+        <strong>Generated by Spend Splash AI</strong>
+
+        <br>
+
+        This report is automatically generated using your locally stored financial data.
+
+    </div>
+
+</div>
+
+</body>
+</html>

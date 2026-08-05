@@ -847,13 +847,298 @@ Save limits
 
 </dialog>
 
+<div
+  class="report"
+  id="report-template"
+  style="position:absolute; left:-9999px; top:0; width:794px; background:#fff;">
+ <!-- HEADER -->
+
+    <div class="header">
+
+        <div class="logo">
+            Logo
+        </div>
+
+        <div class="title">
+
+            <h1>Monthly Financial Report</h1>
+
+            <div class="placeholder">
+                Spend Splash AI
+            </div>
+
+        </div>
+
+        <div class="meta">
+
+            <strong>Generated:</strong><br>
+            {{reportDate}}
+
+            <br><br>
+
+            <strong>Month:</strong><br>
+            {{month}}
+
+        </div>
+
+    </div>
+
+    <!-- OVERVIEW -->
+
+    <div class="section">
+
+        <div class="section-title">
+            Financial Overview
+        </div>
+
+        <div class="overview-grid">
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h3>Monthly Salary</h3>
+                    <div class="icon">💰</div>
+                </div>
+
+                <div class="card-value">
+                    ₹{{salary}}
+                </div>
+
+            </div>
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h3>Total Spent</h3>
+                    <div class="icon">💸</div>
+                </div>
+
+                <div class="card-value">
+                    ₹{{spent}}
+                </div>
+
+            </div>
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h3>Remaining Balance</h3>
+                    <div class="icon">💵</div>
+                </div>
+
+                <div class="card-value">
+                    ₹{{balance}}
+                </div>
+
+            </div>
+
+            <div class="card">
+
+                <div class="card-header">
+                    <h3>Financial Health</h3>
+                    <div class="icon">❤️</div>
+                </div>
+
+                <div class="card-value">
+                    {{healthScore}} / 100
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- CATEGORY -->
+<tbody id="report-categories">
+
+</tbody>
+
+    <!-- AI -->
+
+   <div id="report-ai"></div>
+    <!-- TRANSACTIONS -->
+
+    <div class="section">
+
+        <div class="section-title">
+            Recent Transactions
+        </div>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Date</th>
+                    <th>Expense</th>
+                    <th>Category</th>
+                    <th>Amount</th>
+
+                </tr>
+
+            </thead>
+
+            <tbody id="report-transactions">
+
+</tbody>
+
+        </table>
+
+    </div>
+
+<!-- KPI -->
+
+<div class="section">
+
+    <div class="section-title">
+        Monthly Summary
+    </div>
+
+    <div class="kpi-grid">
+
+        <div class="kpi">
+
+            <div class="kpi-title">
+                Savings Progress
+            </div>
+
+            <div class="kpi-value" id="report-goal">
+
+            </div>
+
+        </div>
+
+        <div class="kpi">
+
+            <div class="kpi-title">
+                Budget Used
+            </div>
+
+            <div class="kpi-value" id="report-budget-used">
+
+            </div>
+
+        </div>
+
+        <div class="kpi">
+
+            <div class="kpi-title">
+                Top Spending Category
+            </div>
+
+            <div class="kpi-value" id="report-top-category">
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div class="section">
+
+    <div class="section-title">
+        Financial Statistics
+    </div>
+
+    <div class="kpi-grid">
+
+        <div class="kpi">
+
+            <div class="kpi-title">
+                Total Transactions
+            </div>
+
+            <div class="kpi-value" id="stats-total-transactions">
+                0
+            </div>
+
+        </div>
+
+        <div class="kpi">
+
+            <div class="kpi-title">
+                Average Expense
+            </div>
+
+            <div class="kpi-value" id="stats-average-expense">
+                ₹0
+            </div>
+
+        </div>
+
+        <div class="kpi">
+
+            <div class="kpi-title">
+                Highest Expense
+            </div>
+
+            <div class="kpi-value" id="stats-highest-expense">
+                ₹0
+            </div>
+
+        </div>
+
+        <div class="kpi">
+
+            <div class="kpi-title">
+                Lowest Expense
+            </div>
+
+            <div class="kpi-value" id="stats-lowest-expense">
+                ₹0
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+    <!-- FOOTER -->
+
+
+    <div class="report-summary">
+
+    <div class="section-title">
+        Report Summary
+    </div>
+
+    <p id="report-summary-text">
+        Your monthly financial summary will appear here.
+    </p>
+
+</div>
+
+    <div class="footer">
+
+        <strong>Generated by Spend Splash AI</strong>
+
+        <br>
+
+        This report is automatically generated using your locally stored financial data.
+
+    </div>
+
+</div>
+
 <div id="toast-container"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 <script src="app.js"></script>
+
+
+
 
 </body>
 
