@@ -185,15 +185,23 @@ Return plain text only.
 
     const orData = await orResponse.json();
 
-    if (!orResponse.ok) {
+   if (!orResponse.ok) {
 
-      return res.status(orResponse.status).json({
-        error:
-          orData?.error?.message ||
-          "OpenRouter request failed."
-      });
+  if (orResponse.status === 429) {
 
-    }
+    return res.status(200).json({
+      answer:
+        "🤖 AI is taking a short break. Our free daily AI quota has been reached. Please try again later."
+    });
+
+  }
+
+  return res.status(200).json({
+    answer:
+      "⚠️ AI is temporarily unavailable. Please try again in a few minutes."
+  });
+
+}
 
     let answer =
       orData?.choices?.[0]?.message?.content ||
