@@ -21,6 +21,8 @@ const categories = {
 const blank = () => ({
   income: 0,
   goal: 0,
+  dailyLimit: 0,
+  dailyLimitAlertShown: false,
   budgets: {
     Food: 3500,
     Transport: 2000,
@@ -59,7 +61,16 @@ const $ = (selector) => {
 
   return element;
 };
+function todayString() {
 
+  const now = new Date();
+
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
 const money = (n) =>
   new Intl.NumberFormat("en-IN", {
     style: "currency",
@@ -812,6 +823,12 @@ else {
 
 }
 suggest(left, spent, top, byCategory);
+//   updateNotifications(
+//   left,
+//   spent,
+//   percent,
+//   byCategory
+// );
 
 renderExpenseChart();
 }
@@ -829,6 +846,8 @@ function suggest(left, spent, top, byCategory) {
     ([category, value]) =>
       value > state.budgets[category]
   );
+
+
 
   let title;
   let body;
@@ -866,14 +885,293 @@ function suggest(left, spent, top, byCategory) {
       } tracked. Your plan updates immediately.`
     : "Your personal spending summary will appear here.";
 
-  $("#ai-result").innerHTML = `
-    <span>SMART CHECK-IN</span>
-    <strong>${title}</strong>
-    <p>${body}</p>
-  `;
+$("#ai-result").innerHTML = `
+<div class="ai-recommendation">
+
+<span>🤖 AI RECOMMENDATION</span>
+
+<strong>${title}</strong>
+
+<p>${body}</p>
+
+<div class="ai-tip">
+
+💡 <b>Quick Tip:</b>
+Ask AI questions like:
+"Can I buy a ₹3000 headphone?"
+or
+"How can I save more this month?"
+
+</div>
+
+</div>
+`;
 
 
 }
+
+// function updateNotifications(
+//   left,
+//   spent,
+//   percent,
+//   byCategory
+// ) {
+  
+
+//   const notifications = [];
+
+//   if (!state.income) {
+
+//     notifications.push({
+//       type: "warning",
+//       title: "Add your monthly salary",
+//       message:
+//         "Start by adding your salary to unlock AI insights and forecasting."
+//     });
+
+//   }
+
+//   else {
+
+//     if (left < 0) {
+
+//       notifications.push({
+//         type: "danger",
+//         title: "Budget Exceeded",
+//         message:
+//           "You have spent more than your monthly salary."
+//       });
+
+//     }
+
+//     else if (percent >= 90) {
+
+//       notifications.push({
+//         type: "warning",
+//         title: "Almost at your limit",
+//         message:
+//           "You have already used " +
+//           percent +
+//           "% of your monthly salary."
+//       });
+
+//     }
+
+//     else {
+
+//       notifications.push({
+//         type: "success",
+//         title: "You're doing great!",
+//         message:
+//           "Your spending is under control. Keep going."
+//       });
+
+//     }
+
+//     const overBudget =
+//       Object.entries(byCategory)
+//         .find(
+//           ([category, value]) =>
+//             value > state.budgets[category]
+//         );
+
+//     if (overBudget) {
+
+//       notifications.push({
+
+//         type: "warning",
+
+//         title: overBudget[0] + " Budget Alert",
+
+//         message:
+//           "You crossed your " +
+//           overBudget[0] +
+//           " budget."
+
+//       });
+
+//     }
+
+//   }
+
+//   $("#notification-area").innerHTML =
+//     notifications
+//       .map(n => `
+
+// <div class="notification ${n.type}">
+
+// <div>
+
+// <strong>${n.title}</strong>
+
+// <p>${n.message}</p>
+
+// </div>
+
+// </div>
+
+// `)
+//       .join("");
+
+//}
+
+
+function showToast(type, title, message){
+
+const toast=document.createElement("div");
+
+toast.className=`toast ${type}`;
+
+toast.innerHTML=`
+
+<strong>${title}</strong>
+
+<p>${message}</p>
+
+`;
+
+$("#toast-container").appendChild(toast);
+
+setTimeout(()=>{
+
+toast.remove();
+
+},4000);
+
+}
+
+async function downloadReport() {
+
+  const { jsPDF } = window.jspdf;
+
+  const pdf = new jsPDF();
+
+  let y = 20;
+
+  pdf.setFontSize(20);
+  pdf.text("Spend Splash Report", 20, y);
+
+  y += 15;
+
+  pdf.setFontSize(12);
+
+  pdf.text(
+    `Month: ${$("#month-label").textContent}`,
+    20,
+    y
+  );
+
+  y += 10;
+
+  pdf.text(
+    `Monthly Salary: ${money(state.income)}`,
+    20,
+    y
+  );
+
+  y += 10;
+
+  pdf.text(
+    `Savings Goal: ${money(state.goal)}`,
+    20,
+    y
+  );
+
+  y += 10;
+
+  pdf.text(
+    `Expenses: ${$("#plan-spend").textContent}`,
+    20,
+    y
+  );
+
+  y += 10;
+
+  pdf.text(
+    `Remaining Balance: ${$("#balance-main").textContent}`,
+    20,
+    y
+  );
+
+  y += 10;
+
+  pdf.text(
+    `Health Score: ${$("#insight-score").textContent}`,
+    20,
+    y
+  );
+
+  y += 15;
+
+  pdf.setFontSize(15);
+
+  pdf.text(
+    "Recent Transactions",
+    20,
+    y
+  );
+
+  y += 10;
+
+  const selector = $("#month-selector");
+
+  const [year, month] =
+    selector.value.split("-").map(Number);
+
+  const transactions =
+    state.expenses.filter(expense => {
+
+      const d = new Date(expense.date);
+
+      return (
+        d.getFullYear() === year &&
+        d.getMonth() === month
+      );
+
+    });
+
+  pdf.setFontSize(11);
+
+  if (!transactions.length) {
+
+    pdf.text(
+      "No transactions found.",
+      20,
+      y
+    );
+
+  } else {
+
+    transactions.forEach(expense => {
+
+      pdf.text(
+
+`${expense.date} | ${expense.name} | ${expense.category} | ${money(expense.amount)}`,
+
+20,
+
+y
+
+);
+
+      y += 8;
+
+      if (y > 280) {
+
+        pdf.addPage();
+
+        y = 20;
+
+      }
+
+    });
+
+  }
+
+  pdf.save("SpendSplash_Report.pdf");
+
+}
+
 function categoryFor(text) {
   text = text.toLowerCase();
 
@@ -886,12 +1184,59 @@ function categoryFor(text) {
   );
 }
 
+  function todaySpent() {
+
+  const today = todayString();
+
+  return state.expenses
+    .filter(expense => expense.date === today)
+    .reduce((sum, expense) => sum + expense.amount, 0);
+
+}
+
+
+function checkDailyLimit() {
+
+  if (!state.dailyLimit) return;
+
+  const spent = todaySpent();
+
+  if (
+    spent > state.dailyLimit &&
+    !state.dailyLimitAlertShown
+  ) {
+
+    showToast(
+  "danger",
+  "🚨 Daily Limit Exceeded",
+  `You spent ${money(spent)} today. Daily limit: ${money(state.dailyLimit)}`
+);
+
+    state.dailyLimitAlertShown = true;
+
+    save();
+
+  }
+
+}
 function addExpense(expense) {
+
   state.expenses.push(expense);
 
   save();
 
-  render();
+ showToast(
+  "success",
+  "Expense Added",
+  `${money(expense.amount)} added successfully.`
+);
+
+render();
+
+checkDailyLimit();
+
+loadAIRecommendation();
+
 }
 
 function openExpense() {
@@ -911,6 +1256,10 @@ function openExpense() {
 }
 
 function openPlan() {
+
+  $("#daily-limit-input").value =
+    state.dailyLimit || "";
+
   $("#income-input").value =
     state.income || "";
 
@@ -932,9 +1281,7 @@ $("#manual-form").onsubmit = (e) => {
     name: $("#manual-name").value.trim(),
     amount: +$("#manual-amount").value,
     category: $("#manual-category").value,
-    date: new Date()
-      .toISOString()
-      .slice(0, 10),
+   date: todayString()
   });
 
   $("#expense-dialog").close();
@@ -968,9 +1315,7 @@ $("#quick-form").onsubmit = (e) => {
 
     category: categoryFor(text),
 
-    date: new Date()
-      .toISOString()
-      .slice(0, 10),
+    date: todayString()
   });
 
   e.target.reset();
@@ -996,11 +1341,18 @@ $("#plan-form").onsubmit = (e) => {
   state.goal =
     +$("#goal-input").value || 0;
 
-  save();
+    state.dailyLimit =
++$("#daily-limit-input").value || 0;
+
+state.dailyLimitAlertShown = false;
+
+save();
 
   $("#plan-dialog").close();
 
   render();
+
+  loadAIRecommendation();
 };
 
 $("#salary-form").onsubmit = (e) => {
@@ -1061,6 +1413,8 @@ $("#budget-form").onsubmit = (e) => {
   $("#budget-dialog").close();
 
   render();
+
+  loadAIRecommendation();
 };
 
 $("#reset-data").onclick = () => {
@@ -1079,7 +1433,31 @@ $("#reset-data").onclick = () => {
   }
 };
 
+
+$("#download-report").onclick = downloadReport;
+
 render();
+
+let currentDay = todayString();
+
+setInterval(() => {
+
+  const now = todayString();
+
+  if (now !== currentDay) {
+
+    currentDay = now;
+
+    state.dailyLimitAlertShown = false;
+
+    save();
+
+    render();
+
+}
+
+}, 60000);
+
 
 document.addEventListener("click", (e) => {
   if (
@@ -1095,10 +1473,19 @@ document.addEventListener("click", (e) => {
 
   if (confirm("Delete this expense?")) {
     state.expenses.splice(index, 1);
+    state.dailyLimitAlertShown = false;
 
     save();
 
     render();
+
+    loadAIRecommendation();
+
+    showToast(
+  "warning",
+  "Expense Deleted",
+  "The expense has been removed."
+);
   }
 });
 
@@ -1230,53 +1617,168 @@ padding:0 11px;
 
 
 
+
   // ---------- PART 3 STARTS HERE ----------
 
 function buildFinancialContext() {
 
   const spent = total();
-
   const left = balance();
-
   const categoryTotals = totals();
 
   const topCategory =
     Object.entries(categoryTotals)
-      .sort((a,b)=>b[1]-a[1])[0];
+      .sort((a, b) => b[1] - a[1])[0];
+
+  const percent =
+    state.income > 0
+      ? Math.round((spent / state.income) * 100)
+      : 0;
+
+  const healthScore =
+    Number($("#insight-score")?.textContent.split("/")[0]) || 0;
+
+  const forecastSpend =
+    $("#forecast-spend")?.textContent || money(0);
+
+  const forecastBalance =
+    $("#forecast-balance")?.textContent || money(0);
+
+  const dailyLimit =
+    state.dailyLimit
+      ? money(state.dailyLimit)
+      : "Not Set";
+
+  const today = todayString();
+
+  const todaySpent = state.expenses
+    .filter(e => e.date === today)
+    .reduce((sum, e) => sum + e.amount, 0);
 
   return `
-Financial Summary
+==========================
+SPEND SPLASH FINANCIAL REPORT
+==========================
 
-Salary: ${money(state.income)}
+Current Month:
+${new Date().toLocaleString("en-IN", {
+  month: "long",
+  year: "numeric"
+})}
 
-Savings Goal: ${money(state.goal)}
+Monthly Salary:
+${money(state.income)}
 
-Spent: ${money(spent)}
+Savings Goal:
+${money(state.goal)}
 
-Remaining Balance: ${money(left)}
+Remaining Balance:
+${money(left)}
 
-Top Category:
+Total Expenses:
+${money(spent)}
+
+Money Used:
+${percent}%
+
+Financial Health Score:
+${healthScore}/100
+
+Forecast Spend:
+${forecastSpend}
+
+Forecast Balance:
+${forecastBalance}
+
+Daily Spending Limit:
+${dailyLimit}
+
+Today's Spending:
+${money(todaySpent)}
+
+Top Spending Category:
 ${topCategory ? topCategory[0] : "None"}
 
-Category Spending:
+Category Breakdown:
 
 ${Object.entries(categoryTotals)
+  .map(([k, v]) => `${k}: ${money(v)}`)
+  .join("\n")}
 
-.map(([k,v])=>`${k}: ${money(v)}`)
-
-.join("\n")}
-
-Recent Expenses:
+Recent Transactions:
 
 ${state.expenses
+  .slice(-5)
+  .reverse()
+  .map(e =>
+`${e.name} • ${money(e.amount)} • ${e.category}`)
+  .join("\n")}
 
-.slice(-5)
+==========================
 
-.map(e=>`${e.name} - ${money(e.amount)} (${e.category})`)
-
-.join("\n")}
+Give personalized financial advice based ONLY on this report.
 
 `;
+}
+
+async function loadAIRecommendation() {
+
+  if (!state.income) return;
+
+  try {
+
+    const context = buildFinancialContext();
+
+    const response = await fetch("/api/advice", {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify({
+
+        question:
+          "Give one short personalized financial recommendation for my dashboard. Return only the recommendation.",
+
+        context,
+
+      }),
+
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.answer) return;
+
+    $("#ai-result").innerHTML = `
+
+<div class="ai-recommendation">
+
+<span>🤖 AI RECOMMENDATION</span>
+
+<strong>Personal Finance Coach</strong>
+
+<p>${data.answer}</p>
+
+<div class="ai-tip">
+
+💡 <b>Quick Tip:</b>
+
+Ask AI anything about your money.
+
+</div>
+
+</div>
+
+`;
+
+  } catch (err) {
+
+    console.error(err);
+
+  }
 
 }
 
@@ -1426,9 +1928,11 @@ document.addEventListener("click", (e) => {
     window.showAllTransactions =
       !window.showAllTransactions;
 
+    
+
     renderExpenseChart();
 render();
-
+loadAIRecommendation();
   }
 
 });

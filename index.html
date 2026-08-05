@@ -180,6 +180,7 @@ Edit salary & goal
 
 </section>
 
+
 <section class="quick-section">
 
 <p class="kicker">
@@ -552,6 +553,14 @@ Update my plan
 
 </button>
 
+<button
+id="download-report"
+class="soft wide">
+
+📄 Download Report
+
+</button>
+
 </article>
 
 </section>
@@ -622,6 +631,8 @@ placeholder="e.g. 18000">
 
 </label>
 
+
+
 <label>
 
 Monthly savings goal (optional)
@@ -633,6 +644,8 @@ min="0"
 placeholder="e.g. 2000">
 
 </label>
+
+
 
 <button>
 
@@ -755,6 +768,18 @@ type="number"
 min="0">
 
 </label>
+<label>
+
+Daily spending limit (optional)
+
+<input
+id="daily-limit-input"
+type="number"
+min="0"
+placeholder="e.g. 500">
+
+</label>
+
 
 <menu>
 
@@ -822,7 +847,11 @@ Save limits
 
 </dialog>
 
+<div id="toast-container"></div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <script src="app.js"></script>
 
