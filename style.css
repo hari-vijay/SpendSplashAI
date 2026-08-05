@@ -715,7 +715,7 @@ max-width:420px;
 display:flex;
 justify-content:space-between;
 align-items:center;
-padding:14px 16px;
+padding: 11px 14px;
 background:#f7fbf9;
 border-radius:12px;
 border:1px solid #e2ece8;
@@ -1843,21 +1843,108 @@ z-index:9999;
 
 .toast{
 
-min-width:320px;
+position:relative;
 
-max-width:380px;
+overflow:hidden;
+
+min-width:340px;
+
+max-width:390px;
 
 padding:16px 18px;
 
 border-radius:18px;
 
-background:#ffffff;
+background:#fff;
 
-box-shadow:0 12px 35px rgba(0,0,0,.15);
+box-shadow:0 14px 36px rgba(0,0,0,.15);
 
-border-left:6px solid #0a6254;
+border-left:6px solid #136d5b;
 
 animation:toastIn .35s ease;
+
+transition:.3s;
+
+}
+
+
+.toast.hide{
+
+opacity:0;
+
+transform:translateX(120px);
+
+}
+
+.toast-header{
+
+display:flex;
+
+align-items:flex-start;
+
+gap:14px;
+
+}
+
+.toast-icon{
+
+font-size:24px;
+
+}
+
+.toast-content strong{
+
+display:block;
+
+font-size:15px;
+
+margin-bottom:5px;
+
+}
+
+.toast-content p{
+
+margin:0;
+
+font-size:13px;
+
+color:#666;
+
+line-height:1.5;
+
+}
+
+.toast-progress{
+
+position:absolute;
+
+left:0;
+
+bottom:0;
+
+height:4px;
+
+width:100%;
+
+background:#136d5b;
+
+animation:progress 4s linear forwards;
+
+}
+
+@keyframes progress{
+
+from{
+
+width:100%;
+
+}
+
+to{
+
+width:0%;
+
+}
 
 }
 
@@ -2260,4 +2347,66 @@ tbody tr:nth-child(even){
 
     color:#136d5b;
 
+}
+
+#spending-chart{
+
+    width:100%!important;
+
+    height:100%!important;
+
+}
+.chart-wrapper{
+    width:240px;
+    height:240px;
+    margin:auto;
+}
+.empty-state{
+
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+text-align:center;
+padding:30px 20px;
+color:#6c7c78;
+
+}
+
+.empty-icon{
+
+font-size:42px;
+margin-bottom:12px;
+opacity:.9;
+
+}
+
+.empty-state h4{
+
+font-size:18px;
+margin-bottom:6px;
+color:#172523;
+
+}
+
+.empty-state p{
+
+font-size:14px;
+line-height:1.5;
+max-width:260px;
+
+}
+
+.category-title{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    width:100%;
+}
+
+.category-left{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    font-weight:600;
 }

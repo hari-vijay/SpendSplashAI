@@ -18,6 +18,15 @@ const categories = {
   Other: [],
 };
 
+const categoryIcons = {
+  Food: "🍔",
+  Transport: "🚗",
+  Shopping: "🛒",
+  Bills: "🏠",
+  Health: "🏥",
+  Other: "🎯"
+};
+
 const blank = () => ({
   income: 0,
   goal: 0,
@@ -39,6 +48,8 @@ let state =
   blank();
 
   let expenseChart = null;
+
+  let spendingChart = null;
 
 const $ = (selector) => {
   const element = document.querySelector(selector);
@@ -72,6 +83,7 @@ function todayString() {
   return `${year}-${month}-${day}`;
 }
 const money = (n) =>
+  
   new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency: "INR",
@@ -337,6 +349,178 @@ elements.length?"pointer":"default";
 
 }
 
+function renderSpendingChart() {
+
+    const canvas = document.getElementById("spending-chart");
+
+    if (!canvas) return;
+
+    const categoryTotals = totals();
+
+    const labels = [];
+    const values = [];
+
+    Object.entries(categoryTotals).forEach(([category, amount]) => {
+
+        if (amount > 0) {
+
+            labels.push(category);
+            values.push(amount);
+
+        }
+
+    });
+
+    if (spendingChart) {
+
+        spendingChart.destroy();
+
+    }
+
+   spendingChart = new Chart(canvas, {
+
+    type: "doughnut",
+
+    data: {
+
+        labels,
+
+        datasets: [{
+
+            data: values,
+
+            backgroundColor: [
+
+                "#136d5b",
+                "#22c55e",
+                "#0ea5e9",
+                "#f59e0b",
+                "#ef4444",
+                "#8b5cf6",
+                "#ec4899",
+                "#64748b"
+
+            ],
+
+            borderWidth: 4,
+            borderColor: "#ffffff",
+            borderRadius: 18,
+            hoverOffset: 22,
+            spacing: 6
+
+        }]
+
+    },
+
+    options: {
+
+        responsive: true,
+
+        maintainAspectRatio: false,
+
+        cutout: "74%",
+
+        animation: {
+
+            duration: 1400,
+            easing: "easeOutQuart"
+
+        },
+
+        plugins: {
+
+            legend: {
+
+                display: false
+
+            },
+
+            tooltip: {
+
+                callbacks: {
+
+                    label(context) {
+
+                        return `${context.label}: ${money(context.raw)}`;
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    },
+
+    plugins: [
+
+        {
+
+            id: "centerText",
+
+            beforeDraw(chart) {
+
+                const ctx = chart.ctx;
+
+                const meta = chart.getDatasetMeta(0);
+
+                if (!meta.data.length) return;
+
+                const x = meta.data[0].x;
+                const y = meta.data[0].y;
+
+                const totalSpent =
+                    values.reduce((a, b) => a + b, 0);
+
+                const percent =
+                    state.income
+                    ? Math.round((totalSpent / state.income) * 100)
+                    : 0;
+
+                ctx.save();
+
+                ctx.textAlign = "center";
+                ctx.textBaseline = "middle";
+
+                // Amount
+                ctx.fillStyle = "#172523";
+                ctx.font = "bold 24px Arial";
+                ctx.fillText(
+                    money(totalSpent),
+                    x,
+                    y - 18
+                );
+
+                // Label
+                ctx.fillStyle = "#6b7280";
+                ctx.font = "14px Arial";
+                ctx.fillText(
+                    "Spent",
+                    x,
+                    y + 8
+                );
+
+                // Percentage
+                ctx.fillStyle = "#136d5b";
+                ctx.font = "bold 18px Arial";
+                ctx.fillText(
+                    percent + "%",
+                    x,
+                    y + 32
+                );
+
+                ctx.restore();
+
+            }
+
+        }
+
+    ]
+
+});
+}
+
 function render() {
  // =========================
 // Current Selected Month
@@ -519,11 +703,7 @@ healthScore = Math.max(
     $("#spent-line").style.background = "#2ecc71";
   }
 
-  $("#ring-value").textContent =
-    percent + "%";
 
-  $("#spend-ring").style.background =
-    `conic-gradient(#0a6254 0 ${percent}%, #e9efec ${percent}% 100%)`;
 
  const selectedDate = new Date(
   selectedYear,
@@ -543,24 +723,37 @@ $("#month-label").textContent =
     "#d85c56",
   ];
 
-  $("#category-list").innerHTML =
-    Object.entries(byCategory)
-      .filter((x) => x[1])
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 4)
-      .map(
-        ([category, value], i) => `
-          <div class="category-item">
-            <span>
-              <i style="background:${colors[i]}"></i>
+$("#category-list").innerHTML =
+  Object.entries(byCategory)
+    .filter(x => x[1])
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 4)
+    .map(
+      ([category, value]) => `
+        <div class="category-item">
+          <span class="category-title">
+            <span class="category-left">
+              ${categoryIcons[category] || "💰"}
               ${category}
             </span>
+
             <b>${money(value)}</b>
-          </div>
-        `
-      )
-      .join("") ||
-    "<small>No categories yet.</small>";
+          </span>
+        </div>
+      `
+    )
+    .join("");
+if (!Object.keys(byCategory).some(key => byCategory[key] > 0)) {
+
+  $("#category-list").innerHTML = `
+    <div class="empty-state">
+      <div class="empty-icon">📊</div>
+      <h4>No spending yet</h4>
+      <p>Add your first expense to see analytics.</p>
+    </div>
+  `;
+
+}
 
   $("#budget-list").innerHTML =
     Object.entries(state.budgets)
@@ -633,9 +826,9 @@ $("#transaction-list").innerHTML =
 
 <div class="transaction">
 
-  <span class="icon">
-    ${expense.category[0]}
-  </span>
+ <span class="icon">
+  ${categoryIcons[expense.category] || "💰"}
+</span>
 
   <span>
 
@@ -685,8 +878,17 @@ $("#transaction-list").innerHTML =
     .join("");
 if (!allTransactions.length) {
 
-  $("#transaction-list").innerHTML =
-    "<p>No expenses yet — add one above.</p>";
+  $("#transaction-list").innerHTML = `
+<div class="empty-state">
+
+<div class="empty-icon">🧾</div>
+
+<h4>No transactions</h4>
+
+<p>Your recent expenses will appear here.</p>
+
+</div>
+`;
 
 } else if (allTransactions.length > 5) {
 
@@ -831,6 +1033,8 @@ suggest(left, spent, top, byCategory);
 // );
 
 renderExpenseChart();
+
+renderSpendingChart();
 }
 
 function suggest(left, spent, top, byCategory) {
@@ -1007,28 +1211,40 @@ $("#ai-result").innerHTML = `
 
 //}
 
+function showToast(type, title, message) {
 
-function showToast(type, title, message){
+    const toast = document.createElement("div");
 
-const toast=document.createElement("div");
+    toast.className = `toast ${type}`;
 
-toast.className=`toast ${type}`;
+    const icons = {
+        success: "✅",
+        warning: "⚠️",
+        danger: "🚨"
+    };
 
-toast.innerHTML=`
+    toast.innerHTML = `
+        <div class="toast-header">
+            <span class="toast-icon">${icons[type] || "💡"}</span>
 
-<strong>${title}</strong>
+            <div class="toast-content">
+                <strong>${title}</strong>
+                <p>${message}</p>
+            </div>
+        </div>
 
-<p>${message}</p>
+        <div class="toast-progress"></div>
+    `;
 
-`;
+    $("#toast-container").appendChild(toast);
 
-$("#toast-container").appendChild(toast);
+    setTimeout(() => {
 
-setTimeout(()=>{
+        toast.classList.add("hide");
 
-toast.remove();
+        setTimeout(() => toast.remove(), 300);
 
-},4000);
+    }, 3800);
 
 }
 
@@ -1601,10 +1817,10 @@ function checkDailyLimit() {
     !state.dailyLimitAlertShown
   ) {
 
-    showToast(
-  "danger",
-  "🚨 Daily Limit Exceeded",
-  `You spent ${money(spent)} today. Daily limit: ${money(state.dailyLimit)}`
+  showToast(
+    "danger",
+    "Daily Limit Exceeded",
+    `${money(spent)} spent today • Limit ${money(state.dailyLimit)}`
 );
 
     state.dailyLimitAlertShown = true;
@@ -1620,10 +1836,10 @@ function addExpense(expense) {
 
   save();
 
- showToast(
-  "success",
-  "Expense Added",
-  `${money(expense.amount)} added successfully.`
+showToast(
+    "success",
+    "Expense Added Successfully",
+    `${expense.category} • ${money(expense.amount)} • Remaining ${money(balance())}`
 );
 
 render();
@@ -1635,19 +1851,25 @@ loadAIRecommendation();
 }
 
 function openExpense() {
+
   $("#manual-category").innerHTML =
     Object.keys(categories)
-      .map(
-        (category) =>
-          `<option>${category}</option>`
-      )
+      .map(category => `<option>${category}</option>`)
       .join("");
 
   $("#manual-form").reset();
 
-  $("#expense-dialog").showModal();
+  const dialog = $("#expense-dialog");
+
+  dialog.showModal();
+
+  dialog.style.left = "50%";
+  dialog.style.top = "50%";
+  dialog.style.transform = "translate(-50%, -50%)";
+  dialog.style.margin = "0";
 
   $("#manual-name").focus();
+
 }
 
 function openPlan() {
@@ -1661,7 +1883,14 @@ function openPlan() {
   $("#goal-input").value =
     state.goal || "";
 
-  $("#plan-dialog").showModal();
+  const dialog = $("#plan-dialog");
+
+  dialog.showModal();
+
+  dialog.style.left = "50%";
+  dialog.style.top = "50%";
+  dialog.style.transform = "translate(-50%, -50%)";
+  dialog.style.margin = "0";
 }
 
 $("#add-manual").onclick = openExpense;
@@ -1878,10 +2107,10 @@ document.addEventListener("click", (e) => {
 
     loadAIRecommendation();
 
-    showToast(
-  "warning",
-  "Expense Deleted",
-  "The expense has been removed."
+  showToast(
+    "warning",
+    "Expense Deleted",
+    `Remaining Balance ${money(balance())}`
 );
   }
 });
