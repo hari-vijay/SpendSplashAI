@@ -1281,102 +1281,33 @@ transform:translateY(0);
     opacity:.7;
     cursor:not-allowed;
 }
-
-
 .splash-answer{
-
-display:none;
-
-margin-top:12px;
-
-padding:14px;
-
-border-radius:12px;
-
-background:rgba(255,255,255,.08);
-
-border:1px solid rgba(255,255,255,.08);
-
-color:#fff;
-
-font-size:14px;
-
-line-height:1.7;
-
-white-space:pre-wrap;
-
-word-break:break-word;
-
-overflow-wrap:anywhere;
-
-height:auto;
-
-min-height:55px;
-
-max-height:none;
-
 opacity:0;
-
 transform:translateY(10px);
-
-transition:.3s;
-
+transition:all .35s ease;
 }
 
 .splash-answer.show{
-
-display:block;
-
 opacity:1;
-
 transform:translateY(0);
-
+display:block;
 }
-
-
-.ai-recommendation{
-
-white-space:normal;
-
-overflow-wrap:anywhere;
-
-word-break:break-word;
-
-line-height:1.7;
-
-}
-
-
-
 
 .splash-chat{
-
-display:flex;
-
-align-items:stretch;
-
-gap:10px;
-
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin-top:14px;
 }
 
 .splash-chat input{
-
-flex:1;
-
-}
-
-.splash-chat button{
-
-width:90px;
-
-flex-shrink:0;
-
-}
-
-.ai-panel{
-
-overflow:hidden;
-
+    flex:1;
+    height:42px;
+    padding:0 14px;
+    border-radius:10px;
+    border:2px solid rgba(255,255,255,.15);
+    font-size:15px;
+    outline:none;
 }
 
 .splash-status{
@@ -1386,9 +1317,29 @@ overflow:hidden;
     font-size:13px;
 }
 
+.splash-answer{
+    display:none;
+    margin-top:10px;
+    padding:12px;
+    border-radius:12px;
+    background:#ffffff10;
 
+    min-height:48px;
+    height:auto;
 
+    white-space:pre-wrap;
+    word-break:break-word;
+    overflow:visible;
+}
 
+.splash-answer.show{
+    opacity:1;
+    transform:translateY(0);
+    display:block;
+}
+.ask-row{
+    display:block !important;
+}
 
 /* ===========================
    MONTHLY GRAPH
