@@ -1,7 +1,7 @@
 module.exports = async function handler(req, res) {
   if (req.method !== "POST") {
     return res.status(405).json({
-      error: "Method not allowed",
+      error: "Method not allowed"
     });
   }
 
@@ -9,28 +9,34 @@ module.exports = async function handler(req, res) {
 
   if (!apiKey) {
     return res.status(500).json({
-      error: "GEMINI_API_KEY is missing.",
+      error: "GEMINI_API_KEY is missing."
     });
   }
 
   try {
+
     const body =
       typeof req.body === "string"
         ? JSON.parse(req.body)
         : req.body;
 
-    const { question, context = "" } = body;
+    const {
+      question,
+      context = ""
+    } = body;
 
-    if (!question?.trim()) {
+    if (!question) {
       return res.status(400).json({
-        error: "Question is required.",
+        error: "Question is required."
       });
     }
 
     const prompt = `
-You are Spend Splash AI Financial Agent.
+You are Spend Splash AI.
 
-The financial summary below is always accurate.
+You are an intelligent personal finance assistant.
+
+Use ONLY the financial report below.
 
 ${context}
 
@@ -38,64 +44,89 @@ User Question:
 ${question}
 
 Rules:
-- Use ONLY the provided financial summary.
+
 - Never invent numbers.
-- Be concise and practical.
-- Explain WHY something happened.
-- Give one clear recommendation.
-- Mention risks if necessary.
-- Encourage savings when appropriate.
-- Keep responses below 120 words.
+- Keep answer below 120 words.
+- Give practical advice.
+- Mention risks if needed.
+- End with one useful tip.
 `;
 
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
+
         headers: {
-          "Content-Type": "application/json",
+          "Content-Type": "application/json"
         },
+
         body: JSON.stringify({
+
           contents: [
+
             {
+
+              role: "user",
+
               parts: [
+
                 {
-                  text: prompt,
-                },
-              ],
-            },
+                  text: prompt
+                }
+
+              ]
+
+            }
+
           ],
+
           generationConfig: {
+
             temperature: 0.4,
-            maxOutputTokens: 300,
-          },
-        }),
+
+            maxOutputTokens: 300
+
+          }
+
+        })
+
       }
     );
 
     const data = await response.json();
 
+    console.log(JSON.stringify(data, null, 2));
+
     if (!response.ok) {
-      console.error(data);
 
       return res.status(response.status).json({
+
         error:
-          data?.error?.message ||
-          "Gemini request failed.",
+          data.error?.message ||
+          "Gemini API Error"
+
       });
+
     }
 
     const answer =
       data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!answer) {
+
       return res.status(500).json({
-        error: "No response from Gemini.",
+
+        error: "No response generated."
+
       });
+
     }
 
     return res.status(200).json({
-      answer: answer.trim(),
+
+      answer
+
     });
 
   } catch (err) {
@@ -103,8 +134,11 @@ Rules:
     console.error(err);
 
     return res.status(500).json({
-      error: err.message,
+
+      error: err.message
+
     });
 
   }
+
 };
