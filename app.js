@@ -1184,6 +1184,172 @@ function categoryFor(text) {
   );
 }
 
+function buildFinancialContext() {
+
+  const spent = total();
+  const left = balance();
+  const categoryTotals = totals();
+
+  const topCategory =
+    Object.entries(categoryTotals)
+      .sort((a, b) => b[1] - a[1])[0];
+
+  const percent =
+    state.income > 0
+      ? Math.round((spent / state.income) * 100)
+      : 0;
+
+  const healthScore =
+    Number($("#insight-score")?.textContent.split("/")[0]) || 0;
+
+  const forecastSpend =
+    $("#forecast-spend")?.textContent || money(0);
+
+  const forecastBalance =
+    $("#forecast-balance")?.textContent || money(0);
+
+  const dailyLimit =
+    state.dailyLimit
+      ? money(state.dailyLimit)
+      : "Not Set";
+
+  const today = todayString();
+
+  const todaySpent = state.expenses
+    .filter(e => e.date === today)
+    .reduce((sum, e) => sum + e.amount, 0);
+
+  return `
+==========================
+SPEND SPLASH FINANCIAL REPORT
+==========================
+
+Current Month:
+${new Date().toLocaleString("en-IN", {
+  month: "long",
+  year: "numeric"
+})}
+
+Monthly Salary:
+${money(state.income)}
+
+Savings Goal:
+${money(state.goal)}
+
+Remaining Balance:
+${money(left)}
+
+Total Expenses:
+${money(spent)}
+
+Money Used:
+${percent}%
+
+Financial Health Score:
+${healthScore}/100
+
+Forecast Spend:
+${forecastSpend}
+
+Forecast Balance:
+${forecastBalance}
+
+Daily Spending Limit:
+${dailyLimit}
+
+Today's Spending:
+${money(todaySpent)}
+
+Top Spending Category:
+${topCategory ? topCategory[0] : "None"}
+
+Category Breakdown:
+
+${Object.entries(categoryTotals)
+  .map(([k, v]) => `${k}: ${money(v)}`)
+  .join("\n")}
+
+Recent Transactions:
+
+${state.expenses
+  .slice(-5)
+  .reverse()
+  .map(e =>
+`${e.name} • ${money(e.amount)} • ${e.category}`)
+  .join("\n")}
+
+==========================
+
+Give personalized financial advice based ONLY on this report.
+
+`;
+}
+
+async function loadAIRecommendation() {
+
+    if (location.protocol === "file:") {
+    return;
+  }
+
+  if (!state.income) return;
+
+  try {
+
+    const context = buildFinancialContext();
+
+    const response = await fetch("/api/advice", {
+
+      method: "POST",
+
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify({
+
+        question:
+          "Give one short personalized financial recommendation for my dashboard. Return only the recommendation.",
+
+        context,
+
+      }),
+
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.answer) return;
+
+    $("#ai-result").innerHTML = `
+
+<div class="ai-recommendation">
+
+<span>🤖 AI RECOMMENDATION</span>
+
+<strong>Personal Finance Coach</strong>
+
+<p>${data.answer}</p>
+
+<div class="ai-tip">
+
+💡 <b>Quick Tip:</b>
+
+Ask AI anything about your money.
+
+</div>
+
+</div>
+
+`;
+
+  } catch (err) {
+
+    console.error(err);
+
+  }
+
+}
+
   function todaySpent() {
 
   const today = todayString();
@@ -1438,6 +1604,8 @@ $("#download-report").onclick = downloadReport;
 
 render();
 
+loadAIRecommendation();
+
 let currentDay = todayString();
 
 setInterval(() => {
@@ -1620,167 +1788,7 @@ padding:0 11px;
 
   // ---------- PART 3 STARTS HERE ----------
 
-function buildFinancialContext() {
 
-  const spent = total();
-  const left = balance();
-  const categoryTotals = totals();
-
-  const topCategory =
-    Object.entries(categoryTotals)
-      .sort((a, b) => b[1] - a[1])[0];
-
-  const percent =
-    state.income > 0
-      ? Math.round((spent / state.income) * 100)
-      : 0;
-
-  const healthScore =
-    Number($("#insight-score")?.textContent.split("/")[0]) || 0;
-
-  const forecastSpend =
-    $("#forecast-spend")?.textContent || money(0);
-
-  const forecastBalance =
-    $("#forecast-balance")?.textContent || money(0);
-
-  const dailyLimit =
-    state.dailyLimit
-      ? money(state.dailyLimit)
-      : "Not Set";
-
-  const today = todayString();
-
-  const todaySpent = state.expenses
-    .filter(e => e.date === today)
-    .reduce((sum, e) => sum + e.amount, 0);
-
-  return `
-==========================
-SPEND SPLASH FINANCIAL REPORT
-==========================
-
-Current Month:
-${new Date().toLocaleString("en-IN", {
-  month: "long",
-  year: "numeric"
-})}
-
-Monthly Salary:
-${money(state.income)}
-
-Savings Goal:
-${money(state.goal)}
-
-Remaining Balance:
-${money(left)}
-
-Total Expenses:
-${money(spent)}
-
-Money Used:
-${percent}%
-
-Financial Health Score:
-${healthScore}/100
-
-Forecast Spend:
-${forecastSpend}
-
-Forecast Balance:
-${forecastBalance}
-
-Daily Spending Limit:
-${dailyLimit}
-
-Today's Spending:
-${money(todaySpent)}
-
-Top Spending Category:
-${topCategory ? topCategory[0] : "None"}
-
-Category Breakdown:
-
-${Object.entries(categoryTotals)
-  .map(([k, v]) => `${k}: ${money(v)}`)
-  .join("\n")}
-
-Recent Transactions:
-
-${state.expenses
-  .slice(-5)
-  .reverse()
-  .map(e =>
-`${e.name} • ${money(e.amount)} • ${e.category}`)
-  .join("\n")}
-
-==========================
-
-Give personalized financial advice based ONLY on this report.
-
-`;
-}
-
-async function loadAIRecommendation() {
-
-  if (!state.income) return;
-
-  try {
-
-    const context = buildFinancialContext();
-
-    const response = await fetch("/api/advice", {
-
-      method: "POST",
-
-      headers: {
-        "Content-Type": "application/json",
-      },
-
-      body: JSON.stringify({
-
-        question:
-          "Give one short personalized financial recommendation for my dashboard. Return only the recommendation.",
-
-        context,
-
-      }),
-
-    });
-
-    const data = await response.json();
-
-    if (!response.ok || !data.answer) return;
-
-    $("#ai-result").innerHTML = `
-
-<div class="ai-recommendation">
-
-<span>🤖 AI RECOMMENDATION</span>
-
-<strong>Personal Finance Coach</strong>
-
-<p>${data.answer}</p>
-
-<div class="ai-tip">
-
-💡 <b>Quick Tip:</b>
-
-Ask AI anything about your money.
-
-</div>
-
-</div>
-
-`;
-
-  } catch (err) {
-
-    console.error(err);
-
-  }
-
-}
 
   form.onsubmit = async (e) => {
     e.preventDefault();
